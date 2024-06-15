@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
@@ -8,6 +7,8 @@ import 'package:ult_whatsapp/pages/Home/chat_homepage.dart';
 import 'package:ult_whatsapp/pages/Home/community_homepage.dart';
 import 'package:ult_whatsapp/pages/Home/status_homepage.dart';
 import 'package:ult_whatsapp/features/auth/auth_controller.dart';
+import 'package:camera/camera.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -20,6 +21,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   late Timer timer;
   bool _isSearching = false;
   late TextEditingController _searchController;
+  List<CameraDescription>? cameras;
+  CameraController? cameraController;
 
   updateUserPresence() {
     ref.read(authControllerProvider).updateUserPresence();
@@ -27,19 +30,47 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   void initState() {
+    super.initState();
     updateUserPresence();
     timer = Timer.periodic(
       const Duration(minutes: 1),
       (timer) => setState(() {}),
     );
-    super.initState();
     _searchController = TextEditingController();
+    _initializeCamera();
   }
 
   @override
   void dispose() {
     timer.cancel();
+    _searchController.dispose();
+    cameraController?.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializeCamera() async {
+    cameras = await availableCameras();
+    if (cameras != null && cameras!.isNotEmpty) {
+      cameraController = CameraController(cameras![0], ResolutionPreset.medium);
+      await cameraController?.initialize();
+    }
+  }
+
+  Future<void> _openCamera() async {
+    if (await Permission.camera.request().isGranted) {
+      if (cameraController != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CameraPreview(cameraController!),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Camera permission denied')),
+      );
+    }
   }
 
   @override
@@ -111,10 +142,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             if (!_isSearching)
               Padding(
                 padding: const EdgeInsets.only(right: 14.0),
-                child: Icon(
-                  Icons.photo_camera_rounded,
-                  color: Colors.white,
-                  size: 22,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.photo_camera_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  onPressed: _openCamera,
                 ),
               ),
             if (!_isSearching)
