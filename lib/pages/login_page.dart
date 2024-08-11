@@ -59,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       favorite: ['KE'],
       countryListTheme: CountryListThemeData(
         bottomSheetHeight: 600,
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         flagSize: 22,
         borderRadius: BorderRadius.circular(20),
         textStyle: TextStyle(

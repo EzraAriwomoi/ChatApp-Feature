@@ -27,7 +27,7 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).colorScheme.surface,
                   child: Column(
                     children: [
                       Text(
@@ -198,7 +198,7 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
       maxImageSize,
     );
     return Container(
-      color: Theme.of(context).backgroundColor,
+      color: Theme.of(context).colorScheme.surface,
       child: Container(
         color: Theme.of(context)
             .appBarTheme
@@ -233,7 +233,7 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
                 icon: Icons.more_vert,
                 iconColor: percent2 > .3
                     ? Colors.white.withOpacity(percent2)
-                    : Theme.of(context).textTheme.bodyText2!.color,
+                    : Theme.of(context).textTheme.bodyMedium!.color,
               ),
             ),
             Positioned(
