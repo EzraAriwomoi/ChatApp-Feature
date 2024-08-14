@@ -87,7 +87,7 @@ class ChatPage extends ConsumerWidget {
                     final lastMessage = lastSeenMessage(singleUserModel.lastSeen);
 
                     return Text(
-                      singleUserModel.active ? 'online' : "last seen $lastMessage ago",
+                      singleUserModel.active ? 'online' : "last seen $lastMessage ago", // last seen
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white,
