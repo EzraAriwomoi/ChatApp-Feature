@@ -10,26 +10,25 @@ showAlertDialog({
     context: context,
     builder: (context) {
       return AlertDialog(
-        content: Text(
-          message,
-          style: TextStyle(
-            color: context.theme.greyColor,
-            fontSize: 15,
-          ),
-        ),
-        contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              btnText ?? "OK",
-              style: TextStyle(
-                color: context.theme.circleImageColor,
-              ),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: context.theme.greyColor,
+              fontSize: 15,
             ),
           ),
-        ],
-      );
+          contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                btnText ?? "OK",
+                style: TextStyle(
+                  color: context.theme.circleImageColor,
+                ),
+              ),
+            ),
+          ]);
     },
   );
 }

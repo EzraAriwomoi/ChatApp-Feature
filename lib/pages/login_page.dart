@@ -113,27 +113,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        title: Text(
-          'Enter your phone number',
-          style: TextStyle(color: context.theme.authAppbarTextColor),
-        ),
-        centerTitle: true,
-        actions: [
-          CustomIconButton(
-            icon: Icons.more_vert,
-            onPressed: () {},
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          elevation: 0,
+          title: Text(
+            'Enter your phone number',
+            style: TextStyle(color: context.theme.authAppbarTextColor),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
+          centerTitle: true,
+          actions: [
+            CustomIconButton(
+              icon: Icons.more_vert,
+              onPressed: () {},
+            ),
+          ]),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
                 text: 'Whatsapp will need to verify your phone number. ',
                 style: TextStyle(
                   color: context.theme.greyColor,
@@ -146,62 +144,58 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       color: context.theme.blueColor,
                     ),
                   ),
-                ],
+                ]),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: CustomTextField(
+            onTap: showCountryPickerBottomSheet,
+            controller: countryNameController,
+            readOnly: true,
+            suffixIcon: const Icon(
+              Icons.arrow_drop_down,
+              color: Coloors.greenDark,
+            ),
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: Row(children: [
+            SizedBox(
+              width: 70,
+              child: CustomTextField(
+                onTap: showCountryPickerBottomSheet,
+                controller: countryCodeController,
+                prefixText: '+',
+                readOnly: true,
+                fontSize: 14,
               ),
             ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
-            child: CustomTextField(
-              onTap: showCountryPickerBottomSheet,
-              controller: countryNameController,
-              readOnly: true,
-              suffixIcon: Icon(
-                Icons.arrow_drop_down,
-                color: Coloors.greenDark,
+            const SizedBox(width: 10),
+            Expanded(
+              child: CustomTextField(
+                controller: phoneNumberController,
+                hintText: 'phone number',
+                autoFocus: true,
+                textAlign: TextAlign.left,
+                keyboardType: TextInputType.number,
+                fontSize: 14,
               ),
-              fontSize: 14,
             ),
+          ]),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Carrier charges may apply',
+          style: TextStyle(
+            color: context.theme.greyColor,
           ),
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 70,
-                  child: CustomTextField(
-                    onTap: showCountryPickerBottomSheet,
-                    controller: countryCodeController,
-                    prefixText: '+',
-                    readOnly: true,
-                    fontSize: 14,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: CustomTextField(
-                    controller: phoneNumberController,
-                    hintText: 'phone number',
-                    autoFocus: true,
-                    textAlign: TextAlign.left,
-                    keyboardType: TextInputType.number,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Carrier charges may apply',
-            style: TextStyle(
-              color: context.theme.greyColor,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: CustomElevatedButton(
         onPressed: sendCodeToPhone,
