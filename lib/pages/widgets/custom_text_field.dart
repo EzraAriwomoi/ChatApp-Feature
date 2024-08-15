@@ -4,7 +4,7 @@ import 'package:ult_whatsapp/common/utils/coloors.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
-    Key? key,
+    super.key,
     this.controller,
     this.hintText,
     this.readOnly,
@@ -16,7 +16,7 @@ class CustomTextField extends StatelessWidget {
     this.onChanged,
     this.fontSize,
     this.autoFocus,
-  }) : super(key: key);
+  });
 
   final TextEditingController? controller;
   final String? hintText;

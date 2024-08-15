@@ -72,36 +72,35 @@ class ContactPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    myListTile(
-                      leading: Icons.group_add_rounded,
-                      text: 'New group',
-                    ),
-                    myListTile(
-                      leading: Icons.person_add_alt_1_rounded,
-                      text: 'New contact',
-                      trailing: Icons.qr_code,
-                    ),
-                    myListTile(
-                      leading: Icons.groups_2_rounded,
-                      text: 'New community',
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      myListTile(
+                        leading: Icons.group_add_rounded,
+                        text: 'New group',
                       ),
-                      child: Text(
-                        'Contacts on WhatsApp',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: context.theme.greyColor,
+                      myListTile(
+                        leading: Icons.person_add_alt_1_rounded,
+                        text: 'New contact',
+                        trailing: Icons.qr_code,
+                      ),
+                      myListTile(
+                        leading: Icons.groups_2_rounded,
+                        text: 'New community',
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: Text(
+                          'Contacts on WhatsApp',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: context.theme.greyColor,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                );
+                    ]);
               } else if (index <= firebaseContacts.length) {
                 final UserModel contact = firebaseContacts[index - 1];
                 return ContactCard(

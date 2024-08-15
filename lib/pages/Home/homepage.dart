@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,7 +70,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Camera permission denied')),
+        const SnackBar(content: Text('Camera permission denied')),
       );
     }
   }
@@ -82,52 +84,50 @@ class _HomePageState extends ConsumerState<HomePage> {
         appBar: AppBar(
           title: _isSearching
               ? Expanded(
-                  child: Stack(
-                    children: [
-                      TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        style: TextStyle(color: Colors.white),
-                        onChanged: (_) {
-                          setState(() {}); // Update the state on text change
-                        },
-                        cursorColor: Coloors.greenDark, // Set the cursor color
-                        decoration: InputDecoration(
-                          hintText: 'Search...',
-                          hintStyle: TextStyle(color: Coloors.greyDark),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Coloors.backgroundDark,
-                          contentPadding: EdgeInsets.only(
-                              left: 50, right: 40), // Adjusted right padding
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: Icon(Icons.clear),
-                                  color: Colors.white,
-                                  onPressed: () {
-                                    setState(() {
-                                      _searchController.clear();
-                                    });
-                                  },
-                                )
-                              : null,
+                  child: Stack(children: [
+                    TextField(
+                      controller: _searchController,
+                      autofocus: true,
+                      style: const TextStyle(color: Colors.white),
+                      onChanged: (_) {
+                        setState(() {}); // Update the state on text change
+                      },
+                      cursorColor: Coloors.greenDark, // Set the cursor color
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: const TextStyle(color: Coloors.greyDark),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
                         ),
+                        filled: true,
+                        fillColor: Coloors.backgroundDark,
+                        contentPadding: const EdgeInsets.only(
+                            left: 50, right: 40), // Adjusted right padding
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                color: Colors.white,
+                                onPressed: () {
+                                  setState(() {
+                                    _searchController.clear();
+                                  });
+                                },
+                              )
+                            : null,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        color: Colors.white,
-                        onPressed: () {
-                          setState(() {
-                            _isSearching = false;
-                            _searchController.clear();
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: Colors.white,
+                      onPressed: () {
+                        setState(() {
+                          _isSearching = false;
+                          _searchController.clear();
+                        });
+                      },
+                    ),
+                  ]),
                 )
               : const Text(
                   'Ult WhatsApp',
@@ -143,7 +143,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(right: 14.0),
                 child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.photo_camera_rounded,
                     color: Colors.white,
                     size: 22,
@@ -155,7 +155,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(right: 0),
                 child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.search,
                     color: Colors.white,
                     size: 22,
@@ -175,7 +175,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     Navigator.pushNamed(context, "settings");
                   }
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.more_vert,
                   color: Colors.white,
                   size: 22,
@@ -186,7 +186,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
                 itemBuilder: (context) {
                   return <PopupMenuEntry<int>>[
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 1,
                       child: SizedBox(
                         width: 140,
@@ -196,7 +196,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                       ),
                     ),
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 2,
                       child: SizedBox(
                         width: 140,
@@ -206,7 +206,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                       ),
                     ),
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 3,
                       child: SizedBox(
                         width: 140,
@@ -216,7 +216,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                       ),
                     ),
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 4,
                       child: SizedBox(
                         width: 140,
@@ -226,7 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                       ),
                     ),
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 5,
                       child: SizedBox(
                         width: 140,
@@ -236,7 +236,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                       ),
                     ),
-                    PopupMenuItem<int>(
+                    const PopupMenuItem<int>(
                       value: 6,
                       child: SizedBox(
                         width: 140,
@@ -248,7 +248,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ];
                 },
-                offset: Offset(0, 45),
+                offset: const Offset(0, 45),
               ),
           ],
           bottom: _isSearching
@@ -258,23 +258,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                   labelStyle: TextStyle(fontWeight: FontWeight.bold),
                   splashFactory: NoSplash.splashFactory,
                   tabs: [
-                    Tab(text: 'Community'),
-                    Tab(text: 'Chats'),
-                    Tab(text: 'Status'),
-                    Tab(text: 'Calls'),
-                  ],
-                ),
+                      Tab(text: 'Community'),
+                      Tab(text: 'Chats'),
+                      Tab(text: 'Status'),
+                      Tab(text: 'Calls'),
+                    ]),
         ),
         body: _isSearching
             ? null // Hide the body when searching
-            : TabBarView(
-                children: [
-                  CommunityHomePage(),
-                  ChatHomePage(),
-                  StatusHomePage(),
-                  CallHomePage(),
-                ],
-              ),
+            : const TabBarView(children: [
+                CommunityHomePage(),
+                ChatHomePage(),
+                StatusHomePage(),
+                CallHomePage(),
+              ]),
       ),
     );
   }

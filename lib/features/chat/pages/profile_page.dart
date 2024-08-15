@@ -55,7 +55,7 @@ class ProfilePage extends StatelessWidget {
                           iconWithText(icon: Icons.search, text: 'Search'),
                         ],
                       ),
-                    ],
+                    ]
                   ),
                 ),
                 const SizedBox(height: 20),

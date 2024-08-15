@@ -93,24 +93,23 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        leading: CustomIconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icons.arrow_back,
-        ),
-        title: Text(
-          'Ult WhatsApp',
-          style: TextStyle(
-            color: context.theme.authAppbarTextColor,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          leading: CustomIconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icons.arrow_back,
           ),
-        ),
-        actions: [
-          CustomIconButton(
-            onPressed: () {},
-            icon: Icons.more_vert,
+          title: Text(
+            'Ult WhatsApp',
+            style: TextStyle(
+              color: context.theme.authAppbarTextColor,
+            ),
           ),
-        ],
-      ),
+          actions: [
+            CustomIconButton(
+              onPressed: () {},
+              icon: Icons.more_vert,
+            ),
+          ]),
       body: Padding(
         padding: const EdgeInsets.all(5.0),
         child: NotificationListener(

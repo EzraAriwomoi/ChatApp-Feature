@@ -11,27 +11,26 @@ class PrivacyAndTerms extends StatelessWidget {
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: 'Read our ',
-          style: TextStyle(
-            color: context.theme.greyColor,
-            height: 1.5,
-          ),
-          children: [
-            TextSpan(
-              text: 'Privacy Policy. ',
-              style: TextStyle(
-                color: context.theme.blueColor,
-              ),
+            text: 'Read our ',
+            style: TextStyle(
+              color: context.theme.greyColor,
+              height: 1.5,
             ),
-            const TextSpan(text: 'Tap "Agree and continue" to accept the '),
-            TextSpan(
-              text: 'Terms of Services.',
-              style: TextStyle(
-                color: context.theme.blueColor,
+            children: [
+              TextSpan(
+                text: 'Privacy Policy. ',
+                style: TextStyle(
+                  color: context.theme.blueColor,
+                ),
               ),
-            ),
-          ],
-        ),
+              const TextSpan(text: 'Tap "Agree and continue" to accept the '),
+              TextSpan(
+                text: 'Terms of Services.',
+                style: TextStyle(
+                  color: context.theme.blueColor,
+                ),
+              ),
+            ]),
       ),
     );
   }

@@ -7,13 +7,11 @@ class LanguageButton extends StatelessWidget {
 
   showBottomSheet(context) {
     showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
               height: 4,
               width: 30,
@@ -23,33 +21,30 @@ class LanguageButton extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 14),
-                  child: Text(
-                    'App Language',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 14),
+                child: Text(
+                  'App Language',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  splashColor: Colors.transparent,
-                  splashRadius: 22,
-                  iconSize: 22,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40),
-                  icon: const Icon(
-                    Icons.close_outlined,
-                    color: Coloors.greyDark,
-                  ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                splashColor: Colors.transparent,
+                splashRadius: 22,
+                iconSize: 22,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40),
+                icon: const Icon(
+                  Icons.close_outlined,
+                  color: Coloors.greyDark,
                 ),
-              ],
-            ),
+              ),
+            ]),
             const SizedBox(height: 10),
             Divider(
               color: context.theme.greyColor!.withOpacity(0.3),
@@ -81,12 +76,12 @@ class LanguageButton extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    },
-  );
+          ]),
+        );
+      },
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -102,27 +97,24 @@ class LanguageButton extends StatelessWidget {
             horizontal: 16,
             vertical: 8.0,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.language,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(
+              Icons.language,
+              color: Coloors.greenDark,
+            ),
+            SizedBox(width: 10),
+            Text(
+              'English',
+              style: TextStyle(
                 color: Coloors.greenDark,
               ),
-              SizedBox(width: 10),
-              Text(
-                'English',
-                style: TextStyle(
-                  color: Coloors.greenDark,
-                ),
-              ),
-              SizedBox(width: 10),
-              Icon(
-                Icons.keyboard_arrow_down,
-                color: Coloors.greenDark,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(width: 10),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: Coloors.greenDark,
+            ),
+          ]),
         ),
       ),
     );

@@ -19,45 +19,42 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 10,
-                ),
-                child: Image.asset(
-                  'assets/circle.png',
-                  color: context.theme.circleImageColor,
-                ),
+      body: Column(children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 50,
+                vertical: 10,
+              ),
+              child: Image.asset(
+                'assets/circle.png',
+                color: context.theme.circleImageColor,
               ),
             ),
           ),
-          const SizedBox(height: 40),
-          Expanded(
-              child: Column(
-            children: [
-              const Text(
-                'Welcome to UltWhatsApp',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+        ),
+        const SizedBox(height: 40),
+        Expanded(
+          child: Column(children: [
+            const Text(
+              'Welcome to UltWhatsApp',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
-              const PrivacyAndTerms(),
-              CustomElevatedButton(
-                onPressed: () => navigateToLoginPage(context),
-                text: 'AGREE AND CONTINUE',
-              ),
-              const SizedBox(height: 50),
-              const LanguageButton(),
-            ],
-          ))
-        ],
-      ),
+            ),
+            const PrivacyAndTerms(),
+            CustomElevatedButton(
+              onPressed: () => navigateToLoginPage(context),
+              text: 'AGREE AND CONTINUE',
+            ),
+            const SizedBox(height: 50),
+            const LanguageButton(),
+          ]),
+        ),
+      ]),
     );
   }
 }

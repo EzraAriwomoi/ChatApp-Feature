@@ -68,8 +68,8 @@ ThemeData lightTheme() {
       tileColor: Coloors.backgroundLight,
     ),
     switchTheme: const SwitchThemeData(
-      thumbColor: MaterialStatePropertyAll(Color(0xFF83939C)),
-      trackColor: MaterialStatePropertyAll(Color(0xFFDADFE2)),
+      thumbColor: WidgetStatePropertyAll(Color(0xFF83939C)),
+      trackColor: WidgetStatePropertyAll(Color(0xFFDADFE2)),
     ), 
     // colorScheme: ColorScheme(background: Coloors.backgroundLight),
   );

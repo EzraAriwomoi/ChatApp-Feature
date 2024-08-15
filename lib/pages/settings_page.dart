@@ -6,12 +6,13 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _isSearching = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   Color getIconColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
@@ -24,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: !_isSearching,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: _isSearching
             ? Expanded(
                 child: Stack(
@@ -33,23 +34,23 @@ class _SettingsPageState extends State<SettingsPage> {
                       cursorColor: Coloors.greenDark,
                       controller: _searchController,
                       autofocus: true,
-                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
                       onChanged: (_) {
                         setState(() {}); // Update the state on text change
                       },
                       decoration: InputDecoration(
                         hintText: 'Search...',
-                        hintStyle: TextStyle(color: Coloors.greyDark, fontSize: 16),
+                        hintStyle: const TextStyle(color: Coloors.greyDark, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
                         fillColor: Coloors.backgroundDark,
-                        contentPadding: EdgeInsets.only(left: 50, right: 20),
+                        contentPadding: const EdgeInsets.only(left: 50, right: 20),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: Icon(Icons.clear),
+                                icon: const Icon(Icons.clear),
                                 color: Colors.white,
                                 onPressed: () {
                                   setState(() {
@@ -61,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back),
                       color: Colors.white,
                       onPressed: () {
                         setState(() {
@@ -73,14 +74,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
               )
-            : Text(
+            : const Text(
                 "Settings",
                 style: TextStyle(color: Colors.white),
               ),
         actions: [
           if (!_isSearching)
             IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {
                 setState(() {
                   _isSearching = true;
@@ -91,11 +92,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(
                   children: [
                     Expanded(
@@ -109,10 +110,10 @@ class _SettingsPageState extends State<SettingsPage> {
                               width: 65,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                               width:
                                   20), // Add spacing between profile picture and details
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -147,50 +148,50 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                         width: 20), // Add spacing between details and icons
-                    Icon(
+                    const Icon(
                       Icons.qr_code_scanner_outlined,
                       color: Coloors.greenDark,
                     ),
-                    SizedBox(width: 14), // Add spacing between icons
-                    Icon(
+                    const SizedBox(width: 14), // Add spacing between icons
+                    const Icon(
                       Icons.arrow_drop_down_circle_outlined,
                       color: Coloors.greenDark,
                     ),
                   ],
                 ),
               ),
-              Divider(
+              const Divider(
                 // Add divider below the last chat item
                 height: 1,
                 thickness: .2,
                 color: Coloors.greyLight,
-                indent: 0, // Set indent to 0 to start from the far left
-                endIndent: 0, // Set endIndent to 0 to end at the far right
+                indent: 0,
+                endIndent: 0,
               ),
               //account settings
               Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(),
+                    padding: const EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
                       leading: Padding(
-                        padding: EdgeInsets.only(),
+                        padding: const EdgeInsets.only(),
                         child: Transform.rotate(
                           angle: pi / 2,
-                          child: Icon(
+                          child: const Icon(
                             Icons.key,
                             color: Coloors.greyDark,
                           ),
                         ),
                       ),
-                      title: Text(
+                      title: const Text(
                         "Account",
                         style: TextStyle(fontSize: 15),
                       ),
-                      subtitle: Text(
+                      subtitle: const Text(
                         "Security notifications, change number",
                         style: TextStyle(
                           fontSize: 14,
@@ -200,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //privacy settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -225,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Avator settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -250,7 +251,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Chat settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -275,7 +276,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Notification settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -300,7 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Storage & data settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -325,7 +326,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //App language settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -350,7 +351,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Help settings
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       dense: true,
@@ -375,7 +376,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //Invite a friend
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       leading: Padding(
@@ -392,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   //App updates
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(),
                     child: ListTile(
                       leading: Padding(
@@ -410,10 +411,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   //From meta
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       children: [
-                        Text(
+                        const Text(
                           "from",
                           style: TextStyle(
                             fontSize: 14,
