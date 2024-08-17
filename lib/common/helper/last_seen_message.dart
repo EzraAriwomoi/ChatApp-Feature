@@ -3,12 +3,10 @@ String lastSeenMessage(int lastSeen) {
   DateTime lastSeenDateTime = DateTime.fromMillisecondsSinceEpoch(lastSeen);
   Duration differenceDuration = now.difference(lastSeenDateTime);
 
-  if (differenceDuration.inMinutes < 1) {
-    return 'Last seen just now';
-  } else if (differenceDuration.inMinutes < 60) {
-    return 'Last seen ${differenceDuration.inMinutes} ${differenceDuration.inMinutes == 1 ? 'minute' : 'minutes'} ago';
+  if (differenceDuration.inMinutes < 60) {
+    return 'Last seen today at ${_formatTime(lastSeenDateTime)}';
   } else if (differenceDuration.inHours < 24) {
-    return 'Last seen ${differenceDuration.inHours} ${differenceDuration.inHours == 1 ? 'hour' : 'hours'} ago';
+    return 'Last seen today at ${_formatTime(lastSeenDateTime)}';
   } else if (differenceDuration.inDays == 1) {
     return 'Last seen yesterday at ${_formatTime(lastSeenDateTime)}';
   } else if (differenceDuration.inDays < 7) {

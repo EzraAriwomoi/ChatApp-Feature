@@ -41,7 +41,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "last seen ${lastSeenMessage(user.lastSeen)} ago",
+                  lastSeenMessage(user.lastSeen),
                   style: TextStyle(color: context.theme.greyColor),
                 ),
                 Row(
@@ -50,7 +50,7 @@ class ProfilePage extends StatelessWidget {
                     iconWithText(icon: Icons.call, text: 'Call'),
                     iconWithText(icon: Icons.video_call, text: 'Video'),
                     iconWithText(icon: Icons.search, text: 'Search'),
-                  ],
+                  ]
                 ),
               ]),
             ),
@@ -59,7 +59,7 @@ class ProfilePage extends StatelessWidget {
               contentPadding: const EdgeInsets.only(left: 30),
               title: const Text('Hey there! I am using WhatsApp'),
               subtitle: Text(
-                '17th February',
+                'August 9, 2023',
                 style: TextStyle(
                   color: context.theme.greyColor,
                 ),
