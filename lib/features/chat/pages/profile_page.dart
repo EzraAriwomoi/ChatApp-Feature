@@ -52,8 +52,8 @@ class ProfilePage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            iconWithText(icon: Icons.call, text: 'Call'),
-                            iconWithText(icon: Icons.video_call, text: 'Video'),
+                            iconWithText(icon: Icons.call_outlined, text: 'Audio'),
+                            iconWithText(icon: Icons.video_call_rounded, text: 'Video'),
                             iconWithText(icon: Icons.search, text: 'Search'),
                           ],
                         ),
