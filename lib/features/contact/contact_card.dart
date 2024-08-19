@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/models/user_model.dart';
-
 import '../../../common/utils/coloors.dart';
 
 class ContactCard extends StatelessWidget {
@@ -10,10 +9,12 @@ class ContactCard extends StatelessWidget {
     super.key,
     required this.contactSource,
     required this.onTap,
+    this.isCurrentUser = false,
   });
 
   final UserModel contactSource;
   final VoidCallback onTap;
+  final bool isCurrentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +45,23 @@ class ContactCard extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-      subtitle: contactSource.uid.isNotEmpty
+      subtitle: isCurrentUser
           ? Text(
-              "Hey there! I'm using WhatsApp",
+              "Message yourself",
               style: TextStyle(
                 color: context.theme.greyColor,
                 fontWeight: FontWeight.w600,
               ),
             )
-          : null,
+          : contactSource.uid.isNotEmpty
+              ? Text(
+                  "Hey there! I'm using WhatsApp",
+                  style: TextStyle(
+                    color: context.theme.greyColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              : null,
       trailing: contactSource.uid.isEmpty
           ? TextButton(
               onPressed: onTap,

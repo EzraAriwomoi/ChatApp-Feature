@@ -15,7 +15,7 @@ class ContactsRepository {
 
   ContactsRepository({required this.firestore});
 
-  Future<List<List<UserModel>>> getAllContacts() async {
+  Future<List<List<UserModel>>> getAllContacts(UserModel currentUser) async {
     List<UserModel> firebaseContacts = [];
     List<UserModel> phoneContacts = [];
 
@@ -60,6 +60,9 @@ class ContactsRepository {
 
           isContactFound = false;
         }
+
+        // Filter out the current user from firebaseContacts
+        firebaseContacts.removeWhere((contact) => contact.uid == currentUser.uid);
       }
     } catch (e) {
       log(e.toString());

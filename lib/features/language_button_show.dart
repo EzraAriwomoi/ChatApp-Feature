@@ -57,7 +57,7 @@ class LanguageButton extends StatelessWidget {
               activeColor: Coloors.greenDark,
               title: const Text('English'),
               subtitle: Text(
-                "(phone's language)",
+                "(Default language)",
                 style: TextStyle(
                   color: context.theme.greyColor,
                 ),
