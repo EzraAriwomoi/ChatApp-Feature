@@ -37,31 +37,27 @@ class AuthRepository {
         .snapshots()
         .map((event) => UserModel.fromMap(event.data()!));
   }
-//presence feature
-  void updateUserPresence() {
-    //declare online and offline map values that will be sent to the realtime database
-    Map<String, dynamic> online = {
-      'active': true,
-      'lastSeen': DateTime.now().millisecondsSinceEpoch,
-    };
-    Map<String, dynamic> offline = {
-      'active': false,
-      'lastSeen': DateTime.now().millisecondsSinceEpoch,
-    };
 
+  // Presence feature
+  void updateUserPresence() {
     final connectedRef = realtime.ref('.info/connected');
 
     connectedRef.onValue.listen((event) async {
       final isConnected = event.snapshot.value as bool? ?? false;
       if (isConnected) {
-        await realtime.ref().child(auth.currentUser!.uid).update(online);
+        // Update Firestore document with the online status
+        await updateActiveStatus(true);
       } else {
-        realtime
-            .ref()
-            .child(auth.currentUser!.uid)
-            .onDisconnect()
-            .update(offline);
+        // Ensure offline status is set when disconnected
+        await updateActiveStatus(false);
       }
+    });
+  }
+
+  Future<void> updateActiveStatus(bool isOnline) async {
+    await firestore.collection('users').doc(auth.currentUser!.uid).update({
+      'is_online': isOnline,
+      'lastSeen': DateTime.now().millisecondsSinceEpoch.toString(),
     });
   }
 
@@ -128,7 +124,7 @@ class AuthRepository {
     try {
       showLoadingDialog(
         context: context,
-        message: 'Verifiying code ... ',
+        message: 'Verifying code ... ',
       );
       final credential = PhoneAuthProvider.credential(
         verificationId: smsCodeId,

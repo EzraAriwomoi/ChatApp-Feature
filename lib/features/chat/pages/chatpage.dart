@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
+import 'package:ult_whatsapp/common/models/message_model.dart';
 import 'package:ult_whatsapp/common/models/user_model.dart';
 import 'package:ult_whatsapp/common/routes/routes.dart';
 import 'package:ult_whatsapp/common/widgets/custom_icon_button.dart';
-import 'package:ult_whatsapp/features/auth/auth_controller.dart';
 import 'package:ult_whatsapp/features/chat/controller/chat_controller.dart';
 import 'package:ult_whatsapp/features/chat/widgets/chat_text_field.dart';
 import 'package:ult_whatsapp/features/chat/widgets/message_card.dart';
@@ -73,12 +73,10 @@ class ChatPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 3),
-              StreamBuilder(
-                stream: ref
-                    .read(authControllerProvider)
-                    .getUserPresenceStatus(uid: user.uid),
+               FutureBuilder<String>(
+                future: lastSeenMessage(user.uid, user.lastSeen),
                 builder: (_, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.active) {
+                  if (snapshot.connectionState != ConnectionState.done) {
                     return const SizedBox();
                   }
 
@@ -86,13 +84,8 @@ class ChatPage extends ConsumerWidget {
                     return const SizedBox();
                   }
 
-                  final singleUserModel = snapshot.data!;
-
-                  // Ensure the lastSeen is displayed correctly
                   return Text(
-                    singleUserModel.active
-                        ? 'online'
-                        : lastSeenMessage(singleUserModel.lastSeen),
+                    snapshot.data!,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white,
@@ -122,7 +115,7 @@ class ChatPage extends ConsumerWidget {
         ],
       ),
       body: Stack(children: [
-        // chat background image
+        // Chat background image
         Image(
           height: double.maxFinite,
           width: double.maxFinite,
@@ -133,7 +126,7 @@ class ChatPage extends ConsumerWidget {
         // Stream of Chat
         Padding(
           padding: const EdgeInsets.only(bottom: 60),
-          child: StreamBuilder(
+          child: StreamBuilder<List<MessageModel>>(
             stream: ref
                 .watch(chatControllerProvider)
                 .getAllOneToOneMessage(user.uid),
