@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/helper/last_seen_message.dart';
@@ -24,7 +25,6 @@ class ProfilePage extends StatelessWidget {
               delegate: SliverPersistentDelegate(user),
               pinned: true,
             ),
-            // Let's create a long list to make the content scrollable
             SliverToBoxAdapter(
               child: Column(
                 children: [
@@ -45,15 +45,34 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          lastSeenMessage(user.lastSeen),
-                          style: TextStyle(color: context.theme.greyColor),
+                        FutureBuilder<String>(
+                          future: lastSeenMessage(user.uid, user.lastSeen),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text('Loading...',
+                                  style: TextStyle(color: Colors.grey));
+                            } else if (snapshot.hasError) {
+                              return const Text('Error fetching status',
+                                  style: TextStyle(color: Colors.red));
+                            } else {
+                              return Text(
+                                snapshot.data ?? 'Unknown status',
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                              );
+                            }
+                          },
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            iconWithText(icon: Icons.call_outlined, text: 'Audio'),
-                            iconWithText(icon: Icons.video_call_rounded, text: 'Video'),
+                            iconWithText(
+                                icon: Icons.call_outlined, text: 'Audio'),
+                            iconWithText(
+                                icon: Icons.video_call_rounded, text: 'Video'),
                             iconWithText(icon: Icons.search, text: 'Search'),
                           ],
                         ),
@@ -95,7 +114,8 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   const CustomListTile(
                     title: 'Encryption',
-                    subTitle: 'Messages and calls are end-to-end encrypted, Tap to verify.',
+                    subTitle:
+                        'Messages and calls are end-to-end encrypted, Tap to verify.',
                     leading: Icons.lock,
                   ),
                   const CustomListTile(
@@ -269,7 +289,8 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
 
 class NoStretchScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildScrollbar(BuildContext context, Widget child, ScrollableDetails details) {
+  Widget buildScrollbar(
+      BuildContext context, Widget child, ScrollableDetails details) {
     return child; // Removes the stretching effect
   }
 
