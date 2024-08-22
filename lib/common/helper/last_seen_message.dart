@@ -4,25 +4,34 @@ Future<String> lastSeenMessage(String userId, int lastSeen) async {
   final isActive = await _checkUserActivity(userId);
 
   if (isActive) {
-    return 'Online';
+    return 'online';
   }
 
   DateTime now = DateTime.now();
   DateTime lastSeenDateTime = DateTime.fromMillisecondsSinceEpoch(lastSeen);
   Duration differenceDuration = now.difference(lastSeenDateTime);
 
-  if (differenceDuration.inMinutes < 60) {
-    return 'Last seen today at ${_formatTime(lastSeenDateTime)}';
-  } else if (differenceDuration.inHours < 24) {
-    return 'Last seen today at ${_formatTime(lastSeenDateTime)}';
-  } else if (differenceDuration.inDays == 1) {
-    return 'Last seen yesterday at ${_formatTime(lastSeenDateTime)}';
-  } else if (differenceDuration.inDays < 7) {
-    String dayOfWeek = _formatDayOfWeek(lastSeenDateTime.weekday);
-    return 'Last seen on $dayOfWeek at ${_formatTime(lastSeenDateTime)}';
-  } else {
-    return 'Last seen on ${_formatDate(lastSeenDateTime)} at ${_formatTime(lastSeenDateTime)}';
+  if (now.day != lastSeenDateTime.day) {
+    // Past midnight handling
+    if (differenceDuration.inDays == 1) {
+      return 'last seen yesterday at ${_formatTime(lastSeenDateTime)}';
+    } else if (differenceDuration.inDays < 7) {
+      // Display the weekday for recent past
+      return 'last seen ${_formatDayOfWeek(lastSeenDateTime.weekday)} at ${_formatTime(lastSeenDateTime)}';
+    } else {
+      // Beyond a week
+      return 'last seen ${_formatDate(lastSeenDateTime)} at ${_formatTime(lastSeenDateTime)}';
+    }
   }
+
+  // Last seen was today
+  if (differenceDuration.inMinutes < 60) {
+    return 'last seen today at ${_formatTime(lastSeenDateTime)}';
+  } else if (differenceDuration.inHours < 24) {
+    return 'last seen today at ${_formatTime(lastSeenDateTime)}';
+  }
+  // For any other case, use 'yesterday'
+  return 'last seen yesterday at ${_formatTime(lastSeenDateTime)}';
 }
 
 Future<bool> _checkUserActivity(String userId) async {
@@ -42,7 +51,6 @@ Future<bool> _checkUserActivity(String userId) async {
       return false;
     }
   } catch (e) {
-    // Handle any errors that might occur
     // print('Error fetching user activity: $e');
     return false;
   }
@@ -53,15 +61,21 @@ String _formatTime(DateTime dateTime) {
 }
 
 String _formatDayOfWeek(int weekday) {
-  List<String> days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  return days[weekday - 1];
+  List<String> days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return days[weekday % 7];
 }
 
 String _formatDate(DateTime dateTime) {
-  return "${_formatMonth(dateTime.month)} ${dateTime.day}, ${dateTime.year}";
+  if (DateTime.now().year == dateTime.year) {
+    return "${_formatMonth(dateTime.month)} ${dateTime.day}";
+  } else {
+    return "${_formatMonth(dateTime.month)} ${dateTime.day}, ${dateTime.year}";
+  }
 }
 
 String _formatMonth(int month) {
-  List<String> months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  List<String> months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
   return months[month - 1];
 }

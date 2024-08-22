@@ -1,4 +1,6 @@
-import 'dart:async'; // Import Timer
+// ignore_for_file: library_private_types_in_public_api
+
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -23,7 +25,7 @@ import '../../../common/helper/last_seen_message.dart';
 final pageStorageBucket = PageStorageBucket();
 
 class ChatPage extends ConsumerStatefulWidget {
-  ChatPage({super.key, required this.user});
+  const ChatPage({super.key, required this.user});
 
   final UserModel user;
 
@@ -42,7 +44,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the ScrollController when the widget is disposed
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -177,7 +179,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {
   final UserModel user;
 
-  const ChatAppBar({Key? key, required this.user}) : super(key: key);
+  const ChatAppBar({super.key, required this.user});
 
   @override
   _ChatAppBarState createState() => _ChatAppBarState();
@@ -201,7 +203,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
   }
 
   void _updateLastSeen() async {
-    final lastSeen = await lastSeenMessage(widget.user.uid, widget.user.lastSeen);
+    final lastSeen =
+        await lastSeenMessage(widget.user.uid, widget.user.lastSeen);
     if (mounted && lastSeen != _lastSeen) {
       setState(() {
         _lastSeen = lastSeen;
@@ -232,7 +235,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: CachedNetworkImageProvider(widget.user.profileImageUrl),
+                  image:
+                      CachedNetworkImageProvider(widget.user.profileImageUrl),
                 ),
               ),
             ),
@@ -249,7 +253,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
               widget.user.username,
               style: const TextStyle(

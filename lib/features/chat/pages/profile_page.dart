@@ -1,4 +1,6 @@
-import 'dart:async'; // Import Timer
+// ignore_for_file: library_private_types_in_public_api
+
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
@@ -281,7 +283,7 @@ class NoStretchScrollBehavior extends ScrollBehavior {
 }
 
 class LastSeenSection extends StatefulWidget {
-  const LastSeenSection({Key? key, required this.user}) : super(key: key);
+  const LastSeenSection({super.key, required this.user});
 
   final UserModel user;
 
