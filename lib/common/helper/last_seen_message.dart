@@ -43,7 +43,7 @@ Future<bool> _checkUserActivity(String userId) async {
     }
   } catch (e) {
     // Handle any errors that might occur
-    print('Error fetching user activity: $e');
+    // print('Error fetching user activity: $e');
     return false;
   }
 }

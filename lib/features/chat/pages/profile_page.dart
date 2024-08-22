@@ -1,5 +1,5 @@
+import 'dart:async'; // Import Timer
 import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/helper/last_seen_message.dart';
@@ -45,27 +45,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        FutureBuilder<String>(
-                          future: lastSeenMessage(user.uid, user.lastSeen),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Text('Loading...',
-                                  style: TextStyle(color: Colors.grey));
-                            } else if (snapshot.hasError) {
-                              return const Text('Error fetching status',
-                                  style: TextStyle(color: Colors.red));
-                            } else {
-                              return Text(
-                                snapshot.data ?? 'Unknown status',
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              );
-                            }
-                          },
-                        ),
+                        LastSeenSection(user: user),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -297,5 +277,59 @@ class NoStretchScrollBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
     return const ClampingScrollPhysics(); // Removes the iOS-style bouncing effect
+  }
+}
+
+class LastSeenSection extends StatefulWidget {
+  const LastSeenSection({Key? key, required this.user}) : super(key: key);
+
+  final UserModel user;
+
+  @override
+  _LastSeenSectionState createState() => _LastSeenSectionState();
+}
+
+class _LastSeenSectionState extends State<LastSeenSection> {
+  Timer? _statusTimer;
+  String _lastSeen = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _startStatusTimer();
+    _updateLastSeen(); // Initial update
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startStatusTimer() {
+    _statusTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _updateLastSeen();
+    });
+  }
+
+  void _updateLastSeen() async {
+    final lastSeen =
+        await lastSeenMessage(widget.user.uid, widget.user.lastSeen);
+    if (mounted) {
+      setState(() {
+        _lastSeen = lastSeen;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _lastSeen,
+      style: TextStyle(
+        fontSize: 16,
+        color: context.theme.greyColor,
+      ),
+    );
   }
 }

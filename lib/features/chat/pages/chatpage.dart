@@ -1,3 +1,4 @@
+import 'dart:async'; // Import Timer
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -21,99 +22,35 @@ import '../../../common/helper/last_seen_message.dart';
 
 final pageStorageBucket = PageStorageBucket();
 
-class ChatPage extends ConsumerWidget {
+class ChatPage extends ConsumerStatefulWidget {
   ChatPage({super.key, required this.user});
 
   final UserModel user;
-  final ScrollController scrollController = ScrollController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _ChatPageState createState() => _ChatPageState();
+}
+
+class _ChatPageState extends ConsumerState<ChatPage> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose(); // Dispose the ScrollController when the widget is disposed
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.theme.chatPageBgColor,
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Row(children: [
-            const Icon(Icons.arrow_back),
-            Hero(
-              tag: 'profile',
-              child: Container(
-                width: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(user.profileImageUrl),
-                  ),
-                ),
-              ),
-            ),
-          ]),
-        ),
-        title: InkWell(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.profile,
-              arguments: user,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                user.username,
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 3),
-               FutureBuilder<String>(
-                future: lastSeenMessage(user.uid, user.lastSeen),
-                builder: (_, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return const SizedBox();
-                  }
-
-                  if (!snapshot.hasData) {
-                    return const SizedBox();
-                  }
-
-                  return Text(
-                    snapshot.data!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  );
-                },
-              ),
-            ]),
-          ),
-        ),
-        actions: [
-          CustomIconButton(
-            onPressed: () {},
-            icon: Icons.video_call,
-            iconColor: Colors.white,
-          ),
-          CustomIconButton(
-            onPressed: () {},
-            icon: Icons.call,
-            iconColor: Colors.white,
-          ),
-          CustomIconButton(
-            onPressed: () {},
-            icon: Icons.more_vert,
-            iconColor: Colors.white,
-          ),
-        ],
-      ),
+      appBar: ChatAppBar(user: widget.user),
       body: Stack(children: [
         // Chat background image
         Image(
@@ -129,7 +66,7 @@ class ChatPage extends ConsumerWidget {
           child: StreamBuilder<List<MessageModel>>(
             stream: ref
                 .watch(chatControllerProvider)
-                .getAllOneToOneMessage(user.uid),
+                .getAllOneToOneMessage(widget.user.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.active) {
                 return ListView.builder(
@@ -183,7 +120,7 @@ class ChatPage extends ConsumerWidget {
                   key: const PageStorageKey('chat_page_list'),
                   itemCount: snapshot.data!.length,
                   shrinkWrap: true,
-                  controller: scrollController,
+                  controller: _scrollController,
                   itemBuilder: (_, index) {
                     final message = snapshot.data![index];
                     final isSender = message.senderId ==
@@ -228,11 +165,130 @@ class ChatPage extends ConsumerWidget {
         Container(
           alignment: const Alignment(0, 1),
           child: ChatTextField(
-            receiverId: user.uid,
-            scrollController: scrollController,
+            receiverId: widget.user.uid,
+            scrollController: _scrollController,
           ),
         ),
       ]),
+    );
+  }
+}
+
+class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {
+  final UserModel user;
+
+  const ChatAppBar({Key? key, required this.user}) : super(key: key);
+
+  @override
+  _ChatAppBarState createState() => _ChatAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _ChatAppBarState extends State<ChatAppBar> {
+  late Timer _lastSeenTimer;
+  String _lastSeen = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _updateLastSeen();
+
+    _lastSeenTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      _updateLastSeen();
+    });
+  }
+
+  void _updateLastSeen() async {
+    final lastSeen = await lastSeenMessage(widget.user.uid, widget.user.lastSeen);
+    if (mounted && lastSeen != _lastSeen) {
+      setState(() {
+        _lastSeen = lastSeen;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _lastSeenTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      leading: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Row(children: [
+          const Icon(Icons.arrow_back),
+          Hero(
+            tag: 'profile',
+            child: Container(
+              width: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(widget.user.profileImageUrl),
+                ),
+              ),
+            ),
+          ),
+        ]),
+      ),
+      title: InkWell(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            Routes.profile,
+            arguments: widget.user,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              widget.user.username,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedOpacity(
+              opacity: _lastSeen.isNotEmpty ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              child: Text(
+                _lastSeen,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+      actions: [
+        CustomIconButton(
+          onPressed: () {},
+          icon: Icons.video_call,
+          iconColor: Colors.white,
+        ),
+        CustomIconButton(
+          onPressed: () {},
+          icon: Icons.call,
+          iconColor: Colors.white,
+        ),
+        CustomIconButton(
+          onPressed: () {},
+          icon: Icons.more_vert,
+          iconColor: Colors.white,
+        ),
+      ],
     );
   }
 }

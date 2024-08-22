@@ -35,9 +35,11 @@ class UserModel {
       uid: map['uid'] ?? '',
       profileImageUrl: map['profileImageUrl'] ?? '',
       active: map['active'] ?? false,
-      lastSeen: map['lastSeen'] ?? 0,
+      lastSeen: map['lastSeen'] is int 
+        ? map['lastSeen'] 
+        : int.tryParse(map['lastSeen'] ?? '0') ?? 0,
       phoneNumber: map['phoneNumber'] ?? '',
-      groupId: List<String>.from(map['groupId']),
+      groupId: List<String>.from(map['groupId'] ?? []),
     );
   }
 }

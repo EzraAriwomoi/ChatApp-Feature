@@ -55,20 +55,40 @@ class AuthRepository {
   }
 
   Future<void> updateActiveStatus(bool isOnline) async {
-    await firestore.collection('users').doc(auth.currentUser!.uid).update({
-      'is_online': isOnline,
-      'lastSeen': DateTime.now().millisecondsSinceEpoch.toString(),
-    });
+    final userStatusDatabaseRef = realtime.ref('status/${auth.currentUser!.uid}');
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    
+    // Update Firestore and Realtime Database with the user's online status
+    if (isOnline) {
+      await firestore.collection('users').doc(auth.currentUser!.uid).update({
+        'is_online': true,
+        'lastSeen': timestamp,
+      });
+
+      await userStatusDatabaseRef.set({
+        'is_online': true,
+        'lastSeen': timestamp,
+      });
+    } else {
+      // Update Firestore and Realtime Database to reflect the last seen time accurately
+      await firestore.collection('users').doc(auth.currentUser!.uid).update({
+        'is_online': false,
+        'lastSeen': timestamp,
+      });
+
+      await userStatusDatabaseRef.set({
+        'is_online': false,
+        'lastSeen': timestamp,
+      });
+    }
   }
 
   Future<UserModel?> getCurrentUserInfo() async {
-    UserModel? user;
     final userInfo =
         await firestore.collection('users').doc(auth.currentUser?.uid).get();
 
-    if (userInfo.data() == null) return user;
-    user = UserModel.fromMap(userInfo.data()!);
-    return user;
+    if (userInfo.data() == null) return null;
+    return UserModel.fromMap(userInfo.data()!);
   }
 
   void saveUserInfoToFirestore({
@@ -124,7 +144,7 @@ class AuthRepository {
     try {
       showLoadingDialog(
         context: context,
-        message: 'Verifying code ... ',
+        message: 'Verifying code... ',
       );
       final credential = PhoneAuthProvider.credential(
         verificationId: smsCodeId,
@@ -160,6 +180,7 @@ class AuthRepository {
           await auth.signInWithCredential(credential);
         },
         verificationFailed: (e) {
+          Navigator.pop(context);
           showAlertDialog(context: context, message: e.toString());
         },
         codeSent: (smsCodeId, resendSmsCodeId) {
