@@ -28,7 +28,9 @@ class AuthRepository {
     required this.auth,
     required this.firestore,
     required this.realtime,
-  });
+  }) {
+    updateUserPresence();
+  }
 
   Stream<UserModel> getUserPresenceStatus({required String uid}) {
     return firestore
@@ -52,35 +54,31 @@ class AuthRepository {
         await updateActiveStatus(false);
       }
     });
+
+    WidgetsBinding.instance.addObserver(LifecycleObserver(
+      onResume: () {
+        updateActiveStatus(true);
+      },
+      onPause: () {
+        updateActiveStatus(false);
+      },
+    ));
   }
 
   Future<void> updateActiveStatus(bool isOnline) async {
     final userStatusDatabaseRef = realtime.ref('status/${auth.currentUser!.uid}');
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Update Firestore and Realtime Database with the user's online status
-    if (isOnline) {
-      await firestore.collection('users').doc(auth.currentUser!.uid).update({
-        'is_online': true,
-        'lastSeen': timestamp,
-      });
+    await firestore.collection('users').doc(auth.currentUser!.uid).update({
+      'is_online': isOnline,
+      'lastSeen': timestamp,
+    });
 
-      await userStatusDatabaseRef.set({
-        'is_online': true,
-        'lastSeen': timestamp,
-      });
-    } else {
-      // Update Firestore and Realtime Database to reflect the last seen time accurately
-      await firestore.collection('users').doc(auth.currentUser!.uid).update({
-        'is_online': false,
-        'lastSeen': timestamp,
-      });
-
-      await userStatusDatabaseRef.set({
-        'is_online': false,
-        'lastSeen': timestamp,
-      });
-    }
+    await userStatusDatabaseRef.set({
+      'is_online': isOnline,
+      'lastSeen': timestamp,
+    });
   }
 
   Future<UserModel?> getCurrentUserInfo() async {
@@ -199,6 +197,25 @@ class AuthRepository {
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       showAlertDialog(context: context, message: e.toString());
+    }
+  }
+}
+
+class LifecycleObserver extends WidgetsBindingObserver {
+  final VoidCallback onResume;
+  final VoidCallback onPause;
+
+  LifecycleObserver({
+    required this.onResume,
+    required this.onPause,
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      onResume();
+    } else if (state == AppLifecycleState.paused) {
+      onPause();
     }
   }
 }
