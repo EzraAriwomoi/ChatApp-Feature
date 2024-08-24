@@ -1,3 +1,6 @@
+// ignore_for_file: library_private_types_in_public_api
+
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
@@ -17,26 +20,86 @@ class NoStretchScrollBehavior extends ScrollBehavior {
   }
 }
 
-class ContactPage extends ConsumerWidget {
+final newContactsLoadingProvider = StateProvider<bool>((ref) => false);
+
+class ContactPage extends ConsumerStatefulWidget {
   const ContactPage({super.key});
+
+  @override
+  _ContactPageState createState() => _ContactPageState();
+}
+
+class _ContactPageState extends ConsumerState<ContactPage> {
+  Timer? _timer;
+  List<UserModel> _previousFirebaseContacts = [];
+  List<UserModel> _previousPhoneContacts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _startContactCheck();
+  }
+
+  void _startContactCheck() {
+    _timer = Timer.periodic(const Duration(seconds: 20), (timer) async {
+      final contactsAsyncValue = ref.watch(contactsControllerProvider);
+      if (contactsAsyncValue is AsyncData<List<List<UserModel>>>) {
+        final allContacts = contactsAsyncValue.value;
+        final firebaseContacts = allContacts[0];
+        final phoneContacts = allContacts[1];
+
+        bool newContactsInFirebase = !_areContactsEqual(firebaseContacts, _previousFirebaseContacts);
+        bool newContactsInPhonebook = !_areContactsEqual(phoneContacts, _previousPhoneContacts);
+
+        if (newContactsInFirebase || newContactsInPhonebook) {
+          ref.read(newContactsLoadingProvider.notifier).state = true;
+          Future.delayed(const Duration(seconds: 1), () {
+            ref.read(newContactsLoadingProvider.notifier).state = false;
+          });
+
+          // Update previous contacts
+          _previousFirebaseContacts = firebaseContacts;
+          _previousPhoneContacts = phoneContacts;
+        }
+      }
+    });
+  }
+
+  bool _areContactsEqual(List<UserModel> list1, List<UserModel> list2) {
+    if (list1.length != list2.length) return false;
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i].uid != list2[i].uid) return false;
+    }
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   Future<void> shareSmsLink(String phoneNumber) async {
     final Uri sms = Uri.parse(
       "sms:$phoneNumber?body=Let's chat on WhatsApp! It's a fast, simple, and secure app we can use to message and call each other for free. Get it at https://whatsapp.com/dl/",
     );
     if (await launchUrl(sms)) {
-    } else {}
+      // Successfully launched SMS
+    } else {
+      // Failed to launch SMS
+    }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<List<UserModel>>> contactsAsyncValue =
-        ref.watch(contactsControllerProvider);
-
+  Widget build(BuildContext context) {
+    final contactsAsyncValue = ref.watch(contactsControllerProvider);
     final currentUserAsyncValue = ref.watch(currentUserProvider);
+    final isNewContactsLoading = ref.watch(newContactsLoadingProvider);
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Coloors.backgroundDark,
+        elevation: 0,
         leading: const BackButton(color: Colors.white),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,16 +122,35 @@ class ContactPage extends ConsumerWidget {
                 'loading...',
                 style: TextStyle(fontSize: 12, color: Colors.white),
               ),
-              error: (error, stackTrace) => const SizedBox(),
+              error: (_, __) => const SizedBox(),
             ),
           ],
         ),
         actions: [
+          if (isNewContactsLoading)
+            const Padding(
+              padding: EdgeInsets.only(right: 6.0),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.0,
+                ),
+              ),
+            ),
           CustomIconButton(
               onPressed: () {}, icon: Icons.search, iconColor: Colors.white),
           CustomIconButton(
               onPressed: () {}, icon: Icons.more_vert, iconColor: Colors.white),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: Coloors.greyBackground.withOpacity(0.5),
+            height: 1.0,
+          ),
+        ),
       ),
       body: contactsAsyncValue.when(
         data: (allContacts) {
@@ -181,9 +263,7 @@ class ContactPage extends ConsumerWidget {
                 color: Coloors.greenDark,
               ),
             ),
-            error: (error, stackTrace) => Center(
-              child: Text('Error: $error'),
-            ),
+            error: (_, __) => const SizedBox(),
           );
         },
         loading: () => const Center(
@@ -191,9 +271,7 @@ class ContactPage extends ConsumerWidget {
             color: Coloors.greenDark,
           ),
         ),
-        error: (error, stackTrace) => Center(
-          child: Text('Error: $error'),
-        ),
+        error: (_, __) => const SizedBox(),
       ),
     );
   }

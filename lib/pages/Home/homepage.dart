@@ -25,6 +25,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late TextEditingController _searchController;
   List<CameraDescription>? cameras;
   CameraController? cameraController;
+  int _selectedIndex = 0; // Default to the 'Chats' tab
 
   updateUserPresence() {
     ref.read(authControllerProvider).updateUserPresence();
@@ -75,16 +76,36 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _buildBody() {
+    switch (_selectedIndex) {
+      case 0:
+        return const ChatHomePage();
+      case 1:
+        return const StatusHomePage();
+      case 2:
+        return const CommunityHomePage();
+      case 3:
+        return const CallHomePage();
+      default:
+        return const ChatHomePage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 1,
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: _isSearching
-              ? Expanded(
-                  child: Stack(children: [
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Coloors.backgroundDark,
+        title: _isSearching
+            ? Expanded(
+                child: Stack(
+                  children: [
                     TextField(
                       controller: _searchController,
                       autofocus: true,
@@ -92,7 +113,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       onChanged: (_) {
                         setState(() {}); // Update the state on text change
                       },
-                      cursorColor: Coloors.greenDark, // Set the cursor color
+                      cursorColor: Coloors.greenDark,
                       decoration: InputDecoration(
                         hintText: 'Search...',
                         hintStyle: const TextStyle(color: Coloors.greyDark),
@@ -102,8 +123,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                         filled: true,
                         fillColor: Coloors.backgroundDark,
-                        contentPadding: const EdgeInsets.only(
-                            left: 50, right: 40), // Adjusted right padding
+                        contentPadding:
+                            const EdgeInsets.only(left: 50, right: 40),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear),
@@ -127,151 +148,181 @@ class _HomePageState extends ConsumerState<HomePage> {
                         });
                       },
                     ),
-                  ]),
-                )
-              : const Text(
-                  'Ult WhatsApp',
-                  style: TextStyle(
-                    letterSpacing: 1,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  ],
                 ),
-          elevation: 0,
-          actions: <Widget>[
-            if (!_isSearching)
-              Padding(
-                padding: const EdgeInsets.only(right: 14.0),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.photo_camera_rounded,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  onPressed: _openCamera,
+              )
+            : const Text(
+                'Ult WhatsApp',
+                style: TextStyle(
+                  letterSpacing: 1,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-            if (!_isSearching)
-              Padding(
-                padding: const EdgeInsets.only(right: 0),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = true;
-                    });
-                  },
-                ),
-              ),
-            if (!_isSearching)
-              PopupMenuButton<int>(
-                onSelected: (selected) {
-                  //if someone clicks on value no. 5 which means settings
-                  if (selected == 5) {
-                    Navigator.pushNamed(context, "settings");
-                  }
-                },
+        elevation: 0,
+        //line below the appbar
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            height: 1.0,
+            color: Coloors.greyBackground,
+          ),
+        ),
+        actions: <Widget>[
+          if (!_isSearching)
+            Padding(
+              padding: const EdgeInsets.only(right: 14.0),
+              child: IconButton(
                 icon: const Icon(
-                  Icons.more_vert,
+                  Icons.photo_camera_rounded,
                   color: Colors.white,
                   size: 22,
                 ),
-                padding: const EdgeInsets.only(right: 1.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                itemBuilder: (context) {
-                  return <PopupMenuEntry<int>>[
-                    const PopupMenuItem<int>(
-                      value: 1,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'New group',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 2,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'New broadcast',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 3,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'Linked devices',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 4,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'Starred messages',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 5,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'Settings',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 6,
-                      child: SizedBox(
-                        width: 140,
-                        child: Text(
-                          'Switch accounts',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                  ];
-                },
-                offset: const Offset(0, 45),
+                onPressed: _openCamera,
               ),
+            ),
+          if (!_isSearching)
+            Padding(
+              padding: const EdgeInsets.only(right: 0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                  size: 22,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isSearching = true;
+                  });
+                },
+              ),
+            ),
+          if (!_isSearching)
+            PopupMenuButton<int>(
+              onSelected: (selected) {
+                if (selected == 5) {
+                  Navigator.pushNamed(context, "settings");
+                }
+              },
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+                size: 22,
+              ),
+              padding: const EdgeInsets.only(right: 1.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              itemBuilder: (context) {
+                return <PopupMenuEntry<int>>[
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'New group',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'New broadcast',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 3,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Linked devices',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 4,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Starred messages',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 5,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Settings',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 6,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Switch accounts',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                ];
+              },
+              offset: const Offset(0, 45),
+            ),
+        ],
+      ),
+      body: _isSearching ? null : _buildBody(),
+      bottomNavigationBar: Container(
+        color: Coloors.backgroundDark,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          //line above the bottombar
+          children: [
+            Container(
+              height: 1,
+              color: Coloors.greyBackground,
+            ),
+            SizedBox(
+              height: 80,
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Coloors.backgroundDark,
+                selectedItemColor: Coloors.greenDark,
+                unselectedItemColor: Colors.white,
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.chat),
+                    label: 'Chats',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.blur_circular_outlined),
+                    label: 'Status',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.groups_outlined),
+                    label: 'Community',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.call_outlined),
+                    label: 'Calls',
+                  ),
+                ],
+              ),
+            ),
           ],
-          bottom: _isSearching
-              ? null // Hide the tabs when searching
-              : const TabBar(
-                  indicatorWeight: 1,
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  splashFactory: NoSplash.splashFactory,
-                  tabs: [
-                      Tab(text: 'Community'),
-                      Tab(text: 'Chats'),
-                      Tab(text: 'Status'),
-                      Tab(text: 'Calls'),
-                    ]),
         ),
-        body: _isSearching
-            ? null // Hide the body when searching
-            : const TabBarView(children: [
-                CommunityHomePage(),
-                ChatHomePage(),
-                StatusHomePage(),
-                CallHomePage(),
-              ]),
       ),
     );
   }
