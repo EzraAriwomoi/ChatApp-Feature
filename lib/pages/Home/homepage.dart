@@ -82,6 +82,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
+  String _getAppBarTitle() {
+    switch (_selectedIndex) {
+      case 1:
+        return 'Statuses';
+      case 2:
+        return 'Communities';
+      case 3:
+        return 'Calls';
+      default:
+        return 'Ult WhatsApp';
+    }
+  }
+
   Widget _buildBody() {
     switch (_selectedIndex) {
       case 0:
@@ -151,9 +164,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               )
-            : const Text(
-                'Ult WhatsApp',
-                style: TextStyle(
+            : Text(
+                _getAppBarTitle(),
+                style: const TextStyle(
                   letterSpacing: 1,
                   fontSize: 25,
                   fontWeight: FontWeight.w900,
