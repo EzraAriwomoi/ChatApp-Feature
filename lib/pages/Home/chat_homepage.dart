@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
@@ -19,6 +20,23 @@ class NoStretchScrollBehavior extends ScrollBehavior {
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
+  }
+}
+
+String _formatTime(DateTime timeSent) {
+  final now = DateTime.now();
+  final todayMidnight = DateTime(now.year, now.month, now.day);
+  final yesterdayMidnight = todayMidnight.subtract(const Duration(days: 1));
+
+  if (timeSent.isAfter(todayMidnight)) {
+    // If the message was sent today, show the time in AM/PM format
+    return DateFormat.jm().format(timeSent);
+  } else if (timeSent.isAfter(yesterdayMidnight)) {
+    // If the message was sent yesterday, display 'yesterday'
+    return 'Yesterday';
+  } else {
+    // If the message is older than yesterday, show the date in DD/MM/YY format
+    return DateFormat('d/M/yy').format(timeSent);
   }
 }
 
@@ -41,7 +59,8 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
 
   void _startChatCheck() {
     _timer = Timer.periodic(const Duration(seconds: 20), (timer) async {
-      final chatsStream = ref.read(chatRepositoryProvider).getAllLastMessageList();
+      final chatsStream =
+          ref.read(chatRepositoryProvider).getAllLastMessageList();
       chatsStream.listen((currentChats) {
         bool newChats = !_areChatsEqual(currentChats, _previousChats);
 
@@ -58,7 +77,8 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
     });
   }
 
-  bool _areChatsEqual(List<LastMessageModel> list1, List<LastMessageModel> list2) {
+  bool _areChatsEqual(
+      List<LastMessageModel> list1, List<LastMessageModel> list2) {
     if (list1.length != list2.length) return false;
     for (int i = 0; i < list1.length; i++) {
       if (list1[i].contactId != list2[i].contactId) return false;
@@ -93,12 +113,13 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
             return ScrollConfiguration(
               behavior: NoStretchScrollBehavior(),
               child: ListView.builder(
-                itemCount: chats.length + 1, // +1 for the "Start a new chat" header
+                itemCount:
+                    chats.length + 1, // +1 for the "Start a new chat" header
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // Display the "Start a new chat" header
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 0,
                         vertical: 0,
                       ),
@@ -107,25 +128,36 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                     final LastMessageModel chat = chats[index - 1];
                     return ListTile(
                       leading: CircleAvatar(
-                        radius: 25, // Adjust the radius to resize the profile photo
+                        radius:
+                            25, // Adjust the radius to resize the profile photo
                         backgroundImage: NetworkImage(chat.profileImageUrl),
                       ),
-                      title: Text(
-                        chat.username,
-                        style: TextStyle(fontSize: 17), // Adjust font size for username
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            chat.username,
+                            style: const TextStyle(
+                                fontSize: 17), // Adjust font size for username
+                          ),
+                          Text(
+                            _formatTime(chat.timeSent),
+                            style: TextStyle(
+                              fontSize: 12, // Adjust font size for time
+                              color: context.theme.greyColor,
+                            ),
+                          ),
+                        ],
                       ),
                       subtitle: Text(
                         chat.lastMessage,
-                        style: TextStyle(fontSize: 15), // Adjust font size for last message
-                      ),
-                      trailing: Text(
-                        "${chat.timeSent.hour}:${chat.timeSent.minute}",
-                        style: TextStyle(
-                          fontSize: 12, // Adjust font size for datetime
-                          color: context.theme.greyColor,
+                        style: const TextStyle(
+                          fontSize: 15, // Adjust font size for last message
+                          color: Color(0xFF667781),
                         ),
                       ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 10.0), // Adjust padding
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 10.0),
                       onTap: () {
                         Navigator.pushNamed(
                           context,
