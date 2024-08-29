@@ -25,6 +25,19 @@ class ChatRepository {
 
   ChatRepository({required this.firestore, required this.auth});
 
+  Future<UserModel?> getUserModelById(String uid) async {
+    try {
+      final userDoc = await firestore.collection('users').doc(uid).get();
+      if (userDoc.exists && userDoc.data() != null) {
+        return UserModel.fromMap(userDoc.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   void sendFileMessage({
     required var file,
     required BuildContext context,

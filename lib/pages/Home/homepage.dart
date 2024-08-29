@@ -314,29 +314,63 @@ class _HomePageState extends ConsumerState<HomePage> {
                 unselectedItemColor: Colors.white,
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.chat),
+                items: [
+                  _buildBottomNavigationBarItem(
+                    icon: Icons.chat,
                     label: 'Chats',
+                    isSelected: _selectedIndex == 0,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.blur_circular_outlined),
+                  _buildBottomNavigationBarItem(
+                    icon: Icons.blur_circular_outlined,
                     label: 'Status',
+                    isSelected: _selectedIndex == 1,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.groups_outlined),
+                  _buildBottomNavigationBarItem(
+                    icon: Icons.groups_outlined,
                     label: 'Community',
+                    isSelected: _selectedIndex == 2,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.call_outlined),
+                  _buildBottomNavigationBarItem(
+                    icon: Icons.call_outlined,
                     label: 'Calls',
+                    isSelected: _selectedIndex == 3,
                   ),
                 ],
+                selectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                ),
+                showSelectedLabels: true,
+                showUnselectedLabels: true,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  BottomNavigationBarItem _buildBottomNavigationBarItem({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+  }) {
+    return BottomNavigationBarItem(
+      icon: Container(
+        padding: EdgeInsets.all(isSelected ? 6.0 : 0),
+        decoration: BoxDecoration(
+          color: isSelected ? Coloors.greenLight : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? Colors.white : Colors.white,
+        ),
+      ),
+      label: label,
     );
   }
 }

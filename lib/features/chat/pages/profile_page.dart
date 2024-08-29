@@ -18,7 +18,6 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.theme.profilePageBg,
       body: ScrollConfiguration(
         behavior: NoStretchScrollBehavior(),
         child: CustomScrollView(
@@ -31,7 +30,7 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Coloors.backgroundDark,
                     child: Column(
                       children: [
                         Text(
@@ -175,7 +174,7 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
   final UserModel user;
 
   final double maxHeaderHeight = 180;
-  final double minHeaderHeight = kToolbarHeight + 20;
+  final double minHeaderHeight = kToolbarHeight + 45;
   final double maxImageSize = 130;
   final double minImageSize = 40;
 
@@ -194,20 +193,17 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
       minImageSize,
       maxImageSize,
     );
-    final currentImagePosition = ((size.width / 2 - 65) * (1 - percent)).clamp(
+    final currentImagePosition = ((size.width / 2 - currentImageSize / 2) * (1 - percent)).clamp(
       minImageSize,
-      maxImageSize,
+      size.width - currentImageSize,
     );
+
     return Container(
-      color: Theme.of(context).colorScheme.surface,
-      child: Container(
-        color: Theme.of(context)
-            .appBarTheme
-            .backgroundColor!
-            .withOpacity(percent2 * 2 < 1 ? percent2 * 2 : 1),
-        child: Stack(children: [
+      color: Coloors.backgroundDark,
+      child: Stack(
+        children: [
           Positioned(
-            top: MediaQuery.of(context).viewPadding.top + 15,
+            top: MediaQuery.of(context).viewPadding.top + 20,
             left: currentImagePosition + 50,
             child: Text(
               user.username,
@@ -243,16 +239,30 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
               tag: 'profile',
               child: Container(
                 width: currentImageSize,
+                height: currentImageSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: CachedNetworkImageProvider(user.profileImageUrl),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
           ),
-        ]),
+          Positioned(
+            bottom: 0, // Positioning at the bottom of the header
+            left: 0,
+            right: 0,
+            child: Visibility(
+              visible: currentImageSize <= minImageSize, // Only show the divider when the image is at its minimum size
+              child: Divider(
+                height: 1,
+                color: context.theme.greyColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -299,7 +309,7 @@ class _LastSeenSectionState extends State<LastSeenSection> {
   void initState() {
     super.initState();
     _startStatusTimer();
-    _updateLastSeen(); // Initial update
+    _updateLastSeen();
   }
 
   @override
