@@ -200,56 +200,70 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
 
     return Container(
       color: Coloors.backgroundDark,
-      child: Stack(children: [
-        Positioned(
-          top: MediaQuery.of(context).viewPadding.top + 20,
-          left: currentImagePosition + 50,
-          child: Text(
-            user.username,
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white.withOpacity(percent2),
+      child: Stack(
+        children: [
+          Positioned(
+            top: MediaQuery.of(context).viewPadding.top + 20,
+            left: currentImagePosition + 50,
+            child: Text(
+              user.username,
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white.withOpacity(percent2),
+              ),
             ),
           ),
-        ),
-        Positioned(
-          left: 0,
-          top: MediaQuery.of(context).viewPadding.top + 5,
-          child: BackButton(
-            color: percent2 > .3 ? Colors.white.withOpacity(percent2) : null,
+          Positioned(
+            left: 0,
+            top: MediaQuery.of(context).viewPadding.top + 5,
+            child: BackButton(
+              color: percent2 > .3 ? Colors.white.withOpacity(percent2) : null,
+            ),
           ),
-        ),
-        Positioned(
-          right: 0,
-          top: MediaQuery.of(context).viewPadding.top + 5,
-          child: CustomIconButton(
-            onPressed: () {},
-            icon: Icons.more_vert,
-            iconColor: percent2 > .3
-                ? Colors.white.withOpacity(percent2)
-                : Theme.of(context).textTheme.bodyMedium!.color,
+          Positioned(
+            right: 0,
+            top: MediaQuery.of(context).viewPadding.top + 5,
+            child: CustomIconButton(
+              onPressed: () {},
+              icon: Icons.more_vert,
+              iconColor: percent2 > .3
+                  ? Colors.white.withOpacity(percent2)
+                  : Theme.of(context).textTheme.bodyMedium!.color,
+            ),
           ),
-        ),
-        Positioned(
-          left: currentImagePosition,
-          top: MediaQuery.of(context).viewPadding.top + 5,
-          bottom: 0,
-          child: Hero(
-            tag: 'profile',
-            child: Container(
-              width: currentImageSize,
-              height: currentImageSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: CachedNetworkImageProvider(user.profileImageUrl),
-                  fit: BoxFit.cover,
+          Positioned(
+            left: currentImagePosition,
+            top: MediaQuery.of(context).viewPadding.top + 5,
+            bottom: 0,
+            child: Hero(
+              tag: 'profile',
+              child: Container(
+                width: currentImageSize,
+                height: currentImageSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(user.profileImageUrl),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ]),
+          Positioned(
+            bottom: 0, // Positioning at the bottom of the header
+            left: 0,
+            right: 0,
+            child: Visibility(
+              visible: currentImageSize <= minImageSize, // Only show the divider when the image is at its minimum size
+              child: Divider(
+                height: 1,
+                color: context.theme.greyColor,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
