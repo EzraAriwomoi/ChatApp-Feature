@@ -137,9 +137,9 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                         ),
                         subtitle: Text(
                           chat.lastMessage,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF667781),
+                            color: context.theme.greyColor,
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(

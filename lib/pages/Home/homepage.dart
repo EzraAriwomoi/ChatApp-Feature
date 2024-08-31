@@ -182,9 +182,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _getAppBarTitle(),
                   style: TextStyle(
                     fontFamily: 'Roboto',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                    color: context.theme.barheadcolor,
+                    fontWeight: _getAppBarTitle() == 'Ult WhatsApp'
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    fontSize: _getAppBarTitle() == 'Ult WhatsApp'
+                        ? 25
+                        : 20,
+                    color: _getAppBarTitle() == 'Ult WhatsApp'
+                        ? context.theme.barheadcolor
+                        : context.theme.baricons
                   ),
                 ),
           elevation: 0,

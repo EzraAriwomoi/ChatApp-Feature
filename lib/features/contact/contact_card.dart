@@ -25,15 +25,15 @@ class ContactCard extends StatelessWidget {
         right: 10,
       ),
       leading: CircleAvatar(
-        backgroundColor: context.theme.greyColor!.withOpacity(.6),
+        backgroundColor: context.theme.greyColor,
         radius: 20,
         backgroundImage: contactSource.profileImageUrl.isNotEmpty
             ? CachedNetworkImageProvider(contactSource.profileImageUrl)
             : null,
         child: contactSource.profileImageUrl.isEmpty
             ? const Icon(
-                Icons.person,
-                size: 38,
+                Icons.person_rounded,
+                size: 40,
                 color: Colors.white,
               )
             : null,
@@ -41,8 +41,7 @@ class ContactCard extends StatelessWidget {
       title: Text(
         contactSource.username,
         style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+          fontSize: 15,
         ),
       ),
       subtitle: isCurrentUser
@@ -50,7 +49,7 @@ class ContactCard extends StatelessWidget {
               "Message yourself",
               style: TextStyle(
                 color: context.theme.greyColor,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
               ),
             )
           : contactSource.uid.isNotEmpty
@@ -58,7 +57,7 @@ class ContactCard extends StatelessWidget {
                   "Hey there! I'm using WhatsApp",
                   style: TextStyle(
                     color: context.theme.greyColor,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
                   ),
                 )
               : null,
@@ -66,9 +65,9 @@ class ContactCard extends StatelessWidget {
           ? TextButton(
               onPressed: onTap,
               style: TextButton.styleFrom(
-                foregroundColor: Coloors.greenDark,
+                foregroundColor: Coloors.greenLight,
               ),
-              child: const Text('Invite'),
+              child: const Text('Invite',style: TextStyle(fontSize: 12,letterSpacing: 1),),
             )
           : null,
     );

@@ -48,8 +48,10 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         final firebaseContacts = allContacts[0];
         final phoneContacts = allContacts[1];
 
-        bool newContactsInFirebase = !_areContactsEqual(firebaseContacts, _previousFirebaseContacts);
-        bool newContactsInPhonebook = !_areContactsEqual(phoneContacts, _previousPhoneContacts);
+        bool newContactsInFirebase =
+            !_areContactsEqual(firebaseContacts, _previousFirebaseContacts);
+        bool newContactsInPhonebook =
+            !_areContactsEqual(phoneContacts, _previousPhoneContacts);
 
         if (newContactsInFirebase || newContactsInPhonebook) {
           ref.read(newContactsLoadingProvider.notifier).state = true;
@@ -98,16 +100,17 @@ class _ContactPageState extends ConsumerState<ContactPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Coloors.backgroundDark,
+        backgroundColor: context.theme.barcolor,
         elevation: 0,
-        leading: const BackButton(color: Colors.white),
+        leading: BackButton(color: context.theme.baricons),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Select contact',
               style: TextStyle(
-                color: Colors.white,
+                fontSize: 17,
+                color: context.theme.baricons,
               ),
             ),
             const SizedBox(height: 0),
@@ -115,12 +118,12 @@ class _ContactPageState extends ConsumerState<ContactPage> {
               data: (allContacts) {
                 return Text(
                   "${allContacts[0].length} contact${allContacts[0].length == 1 ? '' : 's'}",
-                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                  style: TextStyle(fontSize: 12, color: context.theme.baricons),
                 );
               },
-              loading: () => const Text(
+              loading: () => Text(
                 'loading...',
-                style: TextStyle(fontSize: 12, color: Colors.white),
+                style: TextStyle(fontSize: 12, color: context.theme.baricons),
               ),
               error: (_, __) => const SizedBox(),
             ),
@@ -128,27 +131,31 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         ),
         actions: [
           if (isNewContactsLoading)
-            const Padding(
-              padding: EdgeInsets.only(right: 6.0),
+            Padding(
+              padding: const EdgeInsets.only(right: 6.0),
               child: SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: context.theme.baricons,
                   strokeWidth: 2.0,
                 ),
               ),
             ),
           CustomIconButton(
-              onPressed: () {}, icon: Icons.search, iconColor: Colors.white),
+              onPressed: () {},
+              icon: Icons.search,
+              iconColor: context.theme.baricons),
           CustomIconButton(
-              onPressed: () {}, icon: Icons.more_vert, iconColor: Colors.white),
+              onPressed: () {},
+              icon: Icons.more_vert,
+              iconColor: context.theme.baricons),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
-            color: Coloors.greyBackground.withOpacity(0.5),
-            height: 1.0,
+            color: context.theme.line,
+            height: 0.2,
           ),
         ),
       ),
@@ -191,8 +198,8 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                               child: Text(
                                 'Contacts on WhatsApp',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w600,
                                   color: context.theme.greyColor,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -240,9 +247,8 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                         child: Text(
                           'Invite to WhatsApp',
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
                             color: context.theme.greyColor,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       );
@@ -294,14 +300,18 @@ class _ContactPageState extends ConsumerState<ContactPage> {
       title: Text(
         text,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
       ),
       trailing: trailing != null
-          ? Icon(
-              trailing,
-              color: Coloors.greyDark,
+          ? Padding(
+              padding: const EdgeInsets.only(
+                  right: 50.0),
+              child: Icon(
+                trailing,
+                color: context.theme.baricons,
+              ),
             )
           : null,
     );
