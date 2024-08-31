@@ -112,67 +112,105 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
             final chats = snapshot.data!;
             return ScrollConfiguration(
               behavior: NoStretchScrollBehavior(),
-              child: ListView.builder(
-                itemCount:
-                    chats.length + 1, // +1 for the "Start a new chat" header
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    // Display the "Start a new chat" header
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 0,
-                      ),
-                    );
-                  } else {
-                    final LastMessageModel chat = chats[index - 1];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        radius:
-                            25, // Adjust the radius to resize the profile photo
-                        backgroundImage: NetworkImage(chat.profileImageUrl),
-                      ),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            chat.username,
-                            style: const TextStyle(
-                                fontSize: 17), // Adjust font size for username
+              child: ListView(
+                children: [
+                  ...chats.map((chat) => ListTile(
+                        leading: CircleAvatar(
+                          radius: 25,
+                          backgroundImage: NetworkImage(chat.profileImageUrl),
+                        ),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              chat.username,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              _formatTime(chat.timeSent),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: context.theme.greyColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Text(
+                          chat.lastMessage,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF667781),
                           ),
-                          Text(
-                            _formatTime(chat.timeSent),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 2.0, horizontal: 10.0),
+                        onTap: () async {
+                          final userModel = await ref
+                              .read(chatRepositoryProvider)
+                              .getUserModelById(chat.contactId);
+                          if (userModel != null) {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.chat,
+                              arguments: userModel,
+                            );
+                          }
+                        },
+                      )),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "Tap and hold on a chat for more options",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: context.theme.greyColor,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 0.2,
+                    color: context.theme.line,
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.lock_outline_rounded,
+                          color: context.theme.greyColor,
+                          size: 10,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Your personal messages are ",
+                          style: TextStyle(
+                            color: context.theme.greyColor,
+                            fontSize: 10,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () {
+                            // Handle link tap
+                          },
+                          child: const Text(
+                            "end-to-end encrypted",
                             style: TextStyle(
-                              fontSize: 12, // Adjust font size for time
-                              color: context.theme.greyColor,
+                              color: Coloors.greenDark,
+                              fontSize: 10,
+                              letterSpacing: 0,
                             ),
                           ),
-                        ],
-                      ),
-                      subtitle: Text(
-                        chat.lastMessage,
-                        style: const TextStyle(
-                          fontSize: 15, // Adjust font size for last message
-                          color: Color(0xFF667781),
                         ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 2.0, horizontal: 10.0),
-                      onTap: () async {
-                        final userModel = await ref
-                            .read(chatRepositoryProvider)
-                            .getUserModelById(chat.contactId);
-                        if (userModel != null) {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.chat,
-                            arguments: userModel,
-                          );
-                        }
-                      },
-                    );
-                  }
-                },
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           } else {

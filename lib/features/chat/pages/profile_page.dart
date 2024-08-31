@@ -30,19 +30,21 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    color: Coloors.backgroundDark,
+                    color: context.theme.barcolor,
                     child: Column(
                       children: [
                         Text(
                           user.username,
-                          style: const TextStyle(fontSize: 24),
+                          style: const TextStyle(fontSize: 20),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          user.phoneNumber,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: context.theme.greyColor,
+                        RichText(
+                          text: TextSpan(
+                            children: _buildPhoneNumberSpans(user.phoneNumber),
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: context.theme.greyColor,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -168,6 +170,33 @@ class ProfilePage extends StatelessWidget {
       ]),
     );
   }
+
+  List<TextSpan> _buildPhoneNumberSpans(String phoneNumber) {
+    final formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
+    final List<TextSpan> spans = [];
+    for (int i = 0; i < formattedPhoneNumber.length; i++) {
+      if (formattedPhoneNumber[i] == ' ') {
+        spans.add(const TextSpan(text: ' '));
+      } else {
+        spans.add(TextSpan(
+          text: formattedPhoneNumber[i],
+          style: const TextStyle(
+            fontSize: 16,
+            letterSpacing: 0,
+          ),
+        ));
+      }
+    }
+    return spans;
+  }
+
+  String _formatPhoneNumber(String phoneNumber) {
+    phoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    if (phoneNumber.length > 6) {
+      return '+${phoneNumber.substring(0, 3)} ${phoneNumber.substring(3, 6)} ${phoneNumber.substring(6)}';
+    }
+    return phoneNumber;
+  }
 }
 
 class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
@@ -176,7 +205,7 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
   final double maxHeaderHeight = 180;
   final double minHeaderHeight = kToolbarHeight + 45;
   final double maxImageSize = 130;
-  final double minImageSize = 40;
+  final double minImageSize = 42;
 
   SliverPersistentDelegate(this.user);
 
@@ -188,18 +217,18 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final size = MediaQuery.of(context).size;
     final percent = shrinkOffset / (maxHeaderHeight - 35);
-    final percent2 = shrinkOffset / (maxHeaderHeight);
     final currentImageSize = (maxImageSize * (1 - percent)).clamp(
       minImageSize,
       maxImageSize,
     );
-    final currentImagePosition = ((size.width / 2 - currentImageSize / 2) * (1 - percent)).clamp(
+    final currentImagePosition =
+        ((size.width / 2 - currentImageSize / 2) * (1 - percent)).clamp(
       minImageSize,
       size.width - currentImageSize,
     );
 
     return Container(
-      color: Coloors.backgroundDark,
+      color: context.theme.barcolor,
       child: Stack(
         children: [
           Positioned(
@@ -208,8 +237,8 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
             child: Text(
               user.username,
               style: TextStyle(
-                fontSize: 20,
-                color: Colors.white.withOpacity(percent2),
+                fontSize: 18,
+                color: context.theme.baricons,
               ),
             ),
           ),
@@ -217,18 +246,73 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
             left: 0,
             top: MediaQuery.of(context).viewPadding.top + 5,
             child: BackButton(
-              color: percent2 > .3 ? Colors.white.withOpacity(percent2) : null,
+              color: context.theme.baricons,
             ),
           ),
           Positioned(
             right: 0,
             top: MediaQuery.of(context).viewPadding.top + 5,
-            child: CustomIconButton(
-              onPressed: () {},
-              icon: Icons.more_vert,
-              iconColor: percent2 > .3
-                  ? Colors.white.withOpacity(percent2)
-                  : Theme.of(context).textTheme.bodyMedium!.color,
+            child: PopupMenuButton<int>(
+              onSelected: (selected) {
+                // if (selected == 5) {
+                //   Navigator.pushNamed(context, "settings");
+                // }
+              },
+              icon: Icon(
+                Icons.more_vert,
+                color: context.theme.baricons,
+                size: 22,
+              ),
+              padding: const EdgeInsets.only(right: 1.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              color: context.theme.dropdownmenu,
+              itemBuilder: (context) {
+                return <PopupMenuEntry<int>>[
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Share',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 3,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'View in address book',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 4,
+                    child: SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Verify security code',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                  ),
+                ];
+              },
+              offset: const Offset(0, 45),
             ),
           ),
           Positioned(
@@ -251,14 +335,14 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
             ),
           ),
           Positioned(
-            bottom: 0, // Positioning at the bottom of the header
+            bottom: 0,
             left: 0,
             right: 0,
             child: Visibility(
-              visible: currentImageSize <= minImageSize, // Only show the divider when the image is at its minimum size
-              child: Divider(
-                height: 1,
-                color: context.theme.greyColor,
+              visible: currentImageSize <= minImageSize,
+              child: Container(
+                height: 0.2,
+                color: context.theme.line,
               ),
             ),
           ),
@@ -339,7 +423,7 @@ class _LastSeenSectionState extends State<LastSeenSection> {
     return Text(
       _lastSeen,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 14,
         color: context.theme.greyColor,
       ),
     );

@@ -218,16 +218,92 @@ class _ChatAppBarState extends State<ChatAppBar> {
     super.dispose();
   }
 
+  void _showMoreOptions(BuildContext context, Offset position) {
+    final RenderBox appBarRenderBox = context.findRenderObject() as RenderBox;
+    final Offset appBarPosition = appBarRenderBox.localToGlobal(Offset.zero);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    showMenu<int>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        screenWidth - position.dx - 40,
+        appBarPosition.dy + position.dy + 92,
+        position.dx,
+        position.dy,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      color: context.theme.dropdownmenu,
+      items: [
+        const PopupMenuItem<int>(
+          value: 8,
+          child: SizedBox(
+            width: 140,
+            child: Text(
+              'Report',
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+        const PopupMenuItem<int>(
+          value: 9,
+          child: SizedBox(
+            width: 140,
+            child: Text(
+              'Block',
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+        const PopupMenuItem<int>(
+          value: 10,
+          child: SizedBox(
+            width: 140,
+            child: Text(
+              'Clear chat',
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+        const PopupMenuItem<int>(
+          value: 11,
+          child: SizedBox(
+            width: 140,
+            child: Text(
+              'Export chat',
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+        const PopupMenuItem<int>(
+          value: 12,
+          child: SizedBox(
+            width: 140,
+            child: Text(
+              'Add shortcut',
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+      ],
+    ).then((selected) {
+      if (selected == 8) {
+      } else if (selected == 9) {}
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: context.theme.barcolor,
       leading: InkWell(
         onTap: () {
           Navigator.pop(context);
         },
         borderRadius: BorderRadius.circular(20),
         child: Row(children: [
-          const Icon(Icons.arrow_back),
+          Icon(Icons.arrow_back,color: context.theme.baricons),
           Hero(
             tag: 'profile',
             child: Container(
@@ -257,9 +333,9 @@ class _ChatAppBarState extends State<ChatAppBar> {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
               widget.user.username,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
-                color: Colors.white,
+                color: context.theme.baricons,
               ),
             ),
             const SizedBox(height: 3),
@@ -268,9 +344,9 @@ class _ChatAppBarState extends State<ChatAppBar> {
               duration: const Duration(milliseconds: 300),
               child: Text(
                 _lastSeen,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white,
+                  color: context.theme.baricons,
                 ),
               ),
             ),
@@ -280,18 +356,119 @@ class _ChatAppBarState extends State<ChatAppBar> {
       actions: [
         CustomIconButton(
           onPressed: () {},
-          icon: Icons.video_call,
-          iconColor: Colors.white,
+          icon: Icons.videocam_outlined,
+          iconColor: context.theme.baricons,
+          iconSize: 28.0,
         ),
         CustomIconButton(
           onPressed: () {},
-          icon: Icons.call,
-          iconColor: Colors.white,
+          icon: Icons.call_outlined,
+          iconColor: context.theme.baricons,
         ),
-        CustomIconButton(
-          onPressed: () {},
-          icon: Icons.more_vert,
-          iconColor: Colors.white,
+        PopupMenuButton<int>(
+          onSelected: (selected) {
+            if (selected == 7) {
+              RenderBox renderBox = context.findRenderObject() as RenderBox;
+              Offset position = renderBox.localToGlobal(Offset.zero);
+              _showMoreOptions(context, position);
+            }
+          },
+          icon: Icon(
+            Icons.more_vert,
+            color: context.theme.baricons,
+            size: 22,
+          ),
+          padding: const EdgeInsets.only(right: 1.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          color: context.theme.dropdownmenu,
+          itemBuilder: (context) {
+            return <PopupMenuEntry<int>>[
+              const PopupMenuItem<int>(
+                value: 1,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'View contact',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 2,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'Media, links and docs',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 3,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'Search',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 4,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'Mute notifications',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 5,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'Disappearing messages',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 6,
+                child: SizedBox(
+                  width: 140,
+                  child: Text(
+                    'Wallpaper',
+                    style: TextStyle(fontSize: 12.0),
+                  ),
+                ),
+              ),
+              const PopupMenuItem<int>(
+                value: 7,
+                child: SizedBox(
+                  width: 140,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'More',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                      Icon(
+                        Icons
+                            .arrow_right_outlined,
+                        size: 20.0,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ];
+          },
+          offset: const Offset(0, 45),
         ),
       ],
     );

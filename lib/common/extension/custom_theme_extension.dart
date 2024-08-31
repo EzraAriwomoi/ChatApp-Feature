@@ -25,6 +25,11 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? receiverChatCardBg;
   final Color? yellowCardBgColor;
   final Color? yellowCardTextColor;
+  final Color? baricons;
+  final Color? barcolor;
+  final Color? barheadcolor;
+  final Color? line;
+  final Color? dropdownmenu;
 
   const CustomThemeExtension({
     this.circleImageColor,
@@ -43,6 +48,11 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.receiverChatCardBg,
     this.yellowCardBgColor,
     this.yellowCardTextColor,
+    this.baricons,
+    this.barcolor,
+    this.barheadcolor,
+    this.line,
+    this.dropdownmenu,
   });
 
   static const lightMode = CustomThemeExtension(
@@ -62,6 +72,11 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     receiverChatCardBg: Color(0xFFFFFFFF),
     yellowCardBgColor: Color(0xFFFFEECC),
     yellowCardTextColor: Color(0xFF13191C),
+    baricons: Colors.black,
+    barcolor: Colors.white,
+    barheadcolor: Coloors.greenDark,
+    line: Colors.grey,
+    dropdownmenu: Colors.white,
   );
 
   static const darkMode = CustomThemeExtension(
@@ -81,6 +96,10 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     receiverChatCardBg: Coloors.greyBackground,
     yellowCardBgColor: Color(0xFF222E35),
     yellowCardTextColor: Color(0xFFFFD279),
+    baricons: Colors.white,
+    barcolor: Coloors.backgroundDark,
+    line: Coloors.greyBackground,
+    dropdownmenu: Color.fromARGB(255, 17, 27, 34),
   );
 
   @override
