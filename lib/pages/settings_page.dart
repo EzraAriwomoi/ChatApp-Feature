@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'dart:math';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
 
@@ -37,71 +38,91 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          automaticallyImplyLeading: !_isSearching,
-          iconTheme: const IconThemeData(color: Colors.white),
-          title: _isSearching
-              ? Expanded(
-                  child: Stack(children: [
-                    TextField(
-                      cursorColor: Coloors.greenDark,
-                      controller: _searchController,
-                      autofocus: true,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                      onChanged: (_) {
-                        setState(() {}); // Update the state on text change
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        hintStyle: const TextStyle(
-                            color: Coloors.greyDark, fontSize: 16),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Coloors.backgroundDark,
-                        contentPadding:
-                            const EdgeInsets.only(left: 50, right: 20),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                color: Colors.white,
-                                onPressed: () {
-                                  setState(() {
-                                    _searchController.clear();
-                                  });
-                                },
-                              )
-                            : null,
+        automaticallyImplyLeading: !_isSearching,
+        backgroundColor: context.theme.barcolor,
+        iconTheme: IconThemeData(color: context.theme.baricons),
+        title: _isSearching
+            ? Expanded(
+                child: Stack(children: [
+                  TextField(
+                    cursorColor: Coloors.greenDark,
+                    cursorHeight: 15,
+                    controller: _searchController,
+                    autofocus: true,
+                    style: TextStyle(
+                      color: context.theme.baricons,
+                      fontFamily: 'Arial',
+                      fontSize: 16,
+                      letterSpacing: 0,
+                    ),
+                    onChanged: (_) {
+                      setState(() {}); // Update the state on text change
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      hintStyle: const TextStyle(
+                        color: Color.fromARGB(255, 87, 96, 104),
+                        fontSize: 16,
+                        fontFamily: 'Arial',
+                        letterSpacing: 0,
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: context.theme.seachbarColor,
+                      contentPadding:
+                          const EdgeInsets.only(left: 50, right: 20),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              color: context.theme.baricons,
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                });
+                              },
+                            )
+                          : null,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      color: Colors.white,
-                      onPressed: () {
-                        setState(() {
-                          _isSearching = false;
-                          _searchController.clear();
-                        });
-                      },
-                    ),
-                  ]),
-                )
-              : const Text(
-                  "Settings",
-                  style: TextStyle(color: Colors.white),
-                ),
-          actions: [
-            if (!_isSearching)
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-                  setState(() {
-                    _isSearching = true;
-                  });
-                },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    color: context.theme.baricons,
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = false;
+                        _searchController.clear();
+                      });
+                    },
+                  ),
+                ]),
+              )
+            : Text(
+                "Settings",
+                style: TextStyle(color: context.theme.baricons),
               ),
-          ]),
+        actions: [
+          if (!_isSearching)
+            IconButton(
+              icon: const Icon(Icons.search),
+              color: context.theme.baricons,
+              onPressed: () {
+                setState(() {
+                  _isSearching = true;
+                });
+              },
+            ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: context.theme.line,
+            height: 0.2,
+          ),
+        ),
+      ),
       body: ScrollConfiguration(
         behavior: NoStretchScrollBehavior(),
         child: SingleChildScrollView(
@@ -375,70 +396,70 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     subtitle: Text(
                       "Help center, contact us, privacy policy",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Coloors.greyDark,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Coloors.greyDark,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              //Invite a friend
-              const Padding(
-                padding: EdgeInsets.only(),
-                child: ListTile(
-                  leading: Padding(
-                    padding: EdgeInsets.only(),
-                    child: Icon(
-                      Icons.people_alt_rounded,
-                      color: Coloors.greyDark,
+                //Invite a friend
+                const Padding(
+                  padding: EdgeInsets.only(),
+                  child: ListTile(
+                    leading: Padding(
+                      padding: EdgeInsets.only(),
+                      child: Icon(
+                        Icons.people_alt_rounded,
+                        color: Coloors.greyDark,
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    "Invite a friend",
-                    style: TextStyle(fontSize: 15),
+                    title: Text(
+                      "Invite a friend",
+                      style: TextStyle(fontSize: 15),
+                    ),
                   ),
                 ),
-              ),
-              //App updates
-              const Padding(
-                padding: EdgeInsets.only(),
-                child: ListTile(
-                  leading: Padding(
-                    padding: EdgeInsets.only(),
-                    child: Icon(
-                      Icons.security_update_good_sharp,
-                      color: Coloors.greyDark,
+                //App updates
+                const Padding(
+                  padding: EdgeInsets.only(),
+                  child: ListTile(
+                    leading: Padding(
+                      padding: EdgeInsets.only(),
+                      child: Icon(
+                        Icons.security_update_good_sharp,
+                        color: Coloors.greyDark,
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    "App updates",
-                    style: TextStyle(fontSize: 15),
+                    title: Text(
+                      "App updates",
+                      style: TextStyle(fontSize: 15),
+                    ),
                   ),
                 ),
-              ),
-              //From meta
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(children: [
-                  const Text(
-                    "from",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Coloors.greyDark,
+                //From meta
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(children: [
+                    const Text(
+                      "from",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Coloors.greyDark,
+                      ),
                     ),
-                  ),
-                  Image.asset(
-                    'assets/meta.png',
-                    width: 70,
-                    height: 70,
-                    color: getIconColor(context),
-                  ),
-                ]),
-              ),
+                    Image.asset(
+                      'assets/meta.png',
+                      width: 70,
+                      height: 70,
+                      color: getIconColor(context),
+                    ),
+                  ]),
+                ),
+              ]),
             ]),
-          ]),
+          ),
         ),
-      ),
       ),
     );
   }
