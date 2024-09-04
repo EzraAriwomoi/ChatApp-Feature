@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/helper/last_seen_message.dart';
 import 'package:ult_whatsapp/common/models/user_model.dart';
+import 'package:ult_whatsapp/common/routes/routes.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
 import 'package:ult_whatsapp/common/widgets/custom_icon_button.dart';
 import 'package:ult_whatsapp/features/chat/widgets/custom_list_tile.dart';
@@ -37,7 +38,6 @@ class ProfilePage extends StatelessWidget {
                           user.username,
                           style: const TextStyle(fontSize: 20),
                         ),
-                        const SizedBox(height: 10),
                         RichText(
                           text: TextSpan(
                             children: _buildPhoneNumberSpans(user.phoneNumber),
@@ -49,62 +49,148 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         LastSeenSection(user: user),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             iconWithText(
-                                icon: Icons.call_outlined, text: 'Audio'),
+                              context: context,
+                              icon: Icons.message_rounded,
+                              text: 'Message',
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  Routes.chat,
+                                  arguments: user,
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 10),
                             iconWithText(
-                                icon: Icons.video_call_rounded, text: 'Video'),
-                            iconWithText(icon: Icons.search, text: 'Search'),
+                              context: context,
+                              icon: Icons.call_outlined,
+                              text: 'Audio',
+                              onTap: () {
+                                // action for audio
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            iconWithText(
+                              context: context,
+                              icon: Icons.videocam_outlined,
+                              text: 'Video',
+                              onTap: () {
+                                // action for video
+                              },
+                            ),
                           ],
-                        ),
+                        )
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 8,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
+                  ),
                   ListTile(
-                    contentPadding: const EdgeInsets.only(left: 30),
-                    title: const Text('Hey there! I am using WhatsApp'),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                    visualDensity: VisualDensity.compact,
+                    title: const Text(
+                      'Hey there! I am using WhatsApp',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 17,
+                        letterSpacing: 0,
+                      ),
+                    ),
                     subtitle: Text(
                       'August 9, 2023',
                       style: TextStyle(
                         color: context.theme.greyColor,
+                        fontFamily: 'Arial',
+                        fontSize: 14,
+                        letterSpacing: 0,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  CustomListTile(
-                    title: 'Mute notification',
-                    leading: Icons.notifications,
-                    trailing: Switch(
-                      value: false,
-                      onChanged: (value) {},
-                    ),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 8,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
                   ),
                   const CustomListTile(
-                    title: 'Custom notification',
-                    leading: Icons.music_note,
+                    title: 'Notifications',
+                    leading: Icons.notifications_outlined,
                   ),
-                  CustomListTile(
+                  const CustomListTile(
                     title: 'Media visibility',
-                    leading: Icons.photo,
-                    trailing: Switch(
-                      value: false,
-                      onChanged: (value) {},
-                    ),
+                    leading: Icons.photo_outlined,
                   ),
-                  const SizedBox(height: 20),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 8,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
+                  ),
                   const CustomListTile(
                     title: 'Encryption',
                     subTitle:
                         'Messages and calls are end-to-end encrypted, Tap to verify.',
-                    leading: Icons.lock,
+                    leading: Icons.lock_outline_rounded,
                   ),
                   const CustomListTile(
                     title: 'Disappearing messages',
                     subTitle: 'Off',
-                    leading: Icons.timer,
+                    leading: Icons.history_rounded,
+                  ),
+                  CustomListTile(
+                    title: 'Chat lock',
+                    subTitle:
+                        'Lock and hide this chat on this device.',
+                    leading: Icons.lock_clock,
+                    trailing: Switch(
+                      value: false,
+                      onChanged: (value) {},
+                    ),
+                  ),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 8,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   ListTile(
@@ -117,6 +203,19 @@ class ProfilePage extends StatelessWidget {
                     title: Text('Create group with ${user.username}'),
                   ),
                   const SizedBox(height: 20),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 8,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
+                  ),
                   ListTile(
                     contentPadding: const EdgeInsets.only(left: 25, right: 10),
                     leading: const Icon(
@@ -143,7 +242,19 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  // Thick line
+                  Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: context.theme.thicktopline,
+                      ),
+                      Container(
+                        height: 150,
+                        color: context.theme.thickbottomline,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -153,21 +264,52 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  iconWithText({required IconData icon, required String text}) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(
-          icon,
-          size: 30,
-          color: Coloors.greenDark,
+  Widget iconWithText({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: Coloors.greyLight.withOpacity(0.6),
+        highlightColor: Coloors.greyLight.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(20.0),
+        child: Container(
+          width: 120,
+          height: 65,
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Coloors.greyLight,
+              width: 0.4,
+            ),
+            borderRadius: BorderRadius.circular(20.0),
+            color: Colors.transparent,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: Coloors.greenDark,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                text,
+                style: TextStyle(
+                  color: context.theme.baricons,
+                  fontSize: 14,
+                  fontFamily: 'Arial',
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 10),
-        Text(
-          text,
-          style: const TextStyle(color: Coloors.greenDark),
-        ),
-      ]),
+      ),
     );
   }
 
@@ -234,11 +376,14 @@ class SliverPersistentDelegate extends SliverPersistentHeaderDelegate {
           Positioned(
             top: MediaQuery.of(context).viewPadding.top + 20,
             left: currentImagePosition + 50,
-            child: Text(
-              user.username,
-              style: TextStyle(
-                fontSize: 18,
-                color: context.theme.baricons,
+            child: Visibility(
+              visible: currentImageSize < minImageSize + 20,
+              child: Text(
+                user.username,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: context.theme.baricons,
+                ),
               ),
             ),
           ),
