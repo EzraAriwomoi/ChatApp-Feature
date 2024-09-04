@@ -136,26 +136,37 @@ class _HomePageState extends ConsumerState<HomePage> {
                       TextField(
                         controller: _searchController,
                         autofocus: true,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: context.theme.baricons,
+                          fontFamily: 'Arial',
+                          fontSize: 16,
+                          letterSpacing: 0,
+                        ),
                         onChanged: (_) {
                           setState(() {}); // Update the state on text change
                         },
                         cursorColor: Coloors.greenDark,
+                        cursorHeight: 15,
                         decoration: InputDecoration(
                           hintText: 'Search...',
-                          hintStyle: const TextStyle(color: Coloors.greyDark),
+                          hintStyle: TextStyle(
+                            color: context.theme.greyColor,
+                            fontSize: 16,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none,
                           ),
                           filled: true,
-                          fillColor: Coloors.backgroundDark,
+                          fillColor: context.theme.seachbarColor,
                           contentPadding:
                               const EdgeInsets.only(left: 50, right: 40),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.clear),
-                                  color: Colors.white,
+                                  color: context.theme.baricons,
                                   onPressed: () {
                                     setState(() {
                                       _searchController.clear();
@@ -167,7 +178,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.arrow_back),
-                        color: Colors.white,
+                        color: context.theme.baricons,
                         onPressed: () {
                           setState(() {
                             _isSearching = false;
@@ -181,17 +192,14 @@ class _HomePageState extends ConsumerState<HomePage> {
               : Text(
                   _getAppBarTitle(),
                   style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontWeight: _getAppBarTitle() == 'Ult WhatsApp'
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    fontSize: _getAppBarTitle() == 'Ult WhatsApp'
-                        ? 25
-                        : 20,
-                    color: _getAppBarTitle() == 'Ult WhatsApp'
-                        ? context.theme.barheadcolor
-                        : context.theme.baricons
-                  ),
+                      fontFamily: 'Roboto',
+                      fontWeight: _getAppBarTitle() == 'Ult WhatsApp'
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontSize: _getAppBarTitle() == 'Ult WhatsApp' ? 25 : 20,
+                      color: _getAppBarTitle() == 'Ult WhatsApp'
+                          ? context.theme.barheadcolor
+                          : context.theme.baricons),
                 ),
           elevation: 0,
           //line below the appbar

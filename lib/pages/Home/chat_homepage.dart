@@ -124,12 +124,14 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                           children: [
                             Text(
                               chat.username,
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(fontSize: 17,fontFamily: 'Arial'),
                             ),
                             Text(
                               _formatTime(chat.timeSent),
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 13,
+                                fontFamily: 'Arial',
+                                letterSpacing: 0,
                                 color: context.theme.greyColor,
                               ),
                             ),
@@ -138,8 +140,10 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                         subtitle: Text(
                           chat.lastMessage,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 16,
                             color: context.theme.greyColor,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
@@ -162,8 +166,9 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                     child: Text(
                       "Tap and hold on a chat for more options",
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Arial',
                         color: context.theme.greyColor,
                         letterSpacing: 0,
                       ),
@@ -186,10 +191,11 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          "Your personal messages are ",
+                          "Your personal messages are",
                           style: TextStyle(
                             color: context.theme.greyColor,
-                            fontSize: 10,
+                            fontSize: 12,
+                            fontFamily: 'Arial',
                             letterSpacing: 0,
                           ),
                         ),
@@ -202,7 +208,8 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                             "end-to-end encrypted",
                             style: TextStyle(
                               color: Coloors.greenDark,
-                              fontSize: 10,
+                              fontSize: 12,
+                              fontFamily: 'Arial',
                               letterSpacing: 0,
                             ),
                           ),
