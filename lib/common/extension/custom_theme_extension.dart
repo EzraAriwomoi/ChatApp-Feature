@@ -31,6 +31,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? line;
   final Color? dropdownmenu;
   final Color? seachbarColor;
+  final Color? thicktopline;
+  final Color? thickbottomline;
 
   const CustomThemeExtension({
     this.circleImageColor,
@@ -55,6 +57,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.line,
     this.dropdownmenu,
     this.seachbarColor,
+    this.thicktopline,
+    this.thickbottomline,
   });
 
   static const lightMode = CustomThemeExtension(
@@ -80,11 +84,13 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     line: Colors.grey,
     dropdownmenu: Colors.white,
     seachbarColor: Color.fromARGB(255, 241, 240, 240),
+    thicktopline: Color.fromARGB(255, 212, 212, 212),
+    thickbottomline: Color.fromARGB(255, 243, 243, 243),
   );
 
   static const darkMode = CustomThemeExtension(
     circleImageColor: Coloors.greenDark,
-    greyColor: Color.fromARGB(255, 87, 96, 104),
+    greyColor: Coloors.greyDark,
     blueColor: Coloors.blueDark,
     langBgColor: Color(0xFF182229),
     langHightlightColor: Color(0xFF09141A),
@@ -104,6 +110,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     line: Coloors.greyBackground,
     dropdownmenu: Color.fromARGB(255, 17, 27, 34),
     seachbarColor: Color.fromARGB(255, 21, 31, 37),
+    thicktopline: Colors.black,
+    thickbottomline: Colors.black,
   );
 
   @override
