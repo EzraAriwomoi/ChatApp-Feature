@@ -30,6 +30,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? barheadcolor;
   final Color? line;
   final Color? dropdownmenu;
+  final Color? seachbarColor;
   final Color? thicktopline;
   final Color? thickbottomline;
 
@@ -55,6 +56,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.barheadcolor,
     this.line,
     this.dropdownmenu,
+    this.seachbarColor,
     this.thicktopline,
     this.thickbottomline,
   });
@@ -81,6 +83,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     barheadcolor: Coloors.greenDark,
     line: Colors.grey,
     dropdownmenu: Colors.white,
+    seachbarColor: Color.fromARGB(255, 241, 240, 240),
     thicktopline: Color.fromARGB(255, 212, 212, 212),
     thickbottomline: Color.fromARGB(255, 243, 243, 243),
   );
@@ -106,6 +109,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     barcolor: Coloors.backgroundDark,
     line: Coloors.greyBackground,
     dropdownmenu: Color.fromARGB(255, 17, 27, 34),
+    seachbarColor: Color.fromARGB(255, 21, 31, 37),
     thicktopline: Colors.black,
     thickbottomline: Colors.black,
   );
