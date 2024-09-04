@@ -30,6 +30,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? barheadcolor;
   final Color? line;
   final Color? dropdownmenu;
+  final Color? thicktopline;
+  final Color? thickbottomline;
 
   const CustomThemeExtension({
     this.circleImageColor,
@@ -53,6 +55,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.barheadcolor,
     this.line,
     this.dropdownmenu,
+    this.thicktopline,
+    this.thickbottomline,
   });
 
   static const lightMode = CustomThemeExtension(
@@ -77,6 +81,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     barheadcolor: Coloors.greenDark,
     line: Colors.grey,
     dropdownmenu: Colors.white,
+    thicktopline: Color.fromARGB(255, 212, 212, 212),
+    thickbottomline: Color.fromARGB(255, 243, 243, 243),
   );
 
   static const darkMode = CustomThemeExtension(
@@ -100,6 +106,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     barcolor: Coloors.backgroundDark,
     line: Coloors.greyBackground,
     dropdownmenu: Color.fromARGB(255, 17, 27, 34),
+    thicktopline: Colors.black,
+    thickbottomline: Colors.black,
   );
 
   @override
