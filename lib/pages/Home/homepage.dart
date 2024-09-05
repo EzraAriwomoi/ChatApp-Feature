@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
+import 'package:ult_whatsapp/features/popups/popup_verification.dart';
 import 'package:ult_whatsapp/pages/Home/call_homepage.dart';
 import 'package:ult_whatsapp/pages/Home/chat_homepage.dart';
 import 'package:ult_whatsapp/pages/Home/community_homepage.dart';
@@ -244,6 +245,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 onSelected: (selected) {
                   if (selected == 5) {
                     Navigator.pushNamed(context, "settings");
+                  } else if (selected == 6) {
+                    PopupVerification.showVerificationPopup(context); // Show the popup
                   }
                 },
                 icon: Icon(
