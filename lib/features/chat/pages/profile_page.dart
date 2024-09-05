@@ -171,8 +171,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   CustomListTile(
                     title: 'Chat lock',
-                    subTitle:
-                        'Lock and hide this chat on this device.',
+                    subTitle: 'Lock and hide this chat on this device.',
                     leading: Icons.lock_clock,
                     trailing: Switch(
                       value: false,
@@ -192,66 +191,91 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  ListTile(
-                    leading: CustomIconButton(
-                      onPressed: () {},
-                      icon: Icons.group,
-                      background: Coloors.greenDark,
-                      iconColor: Colors.white,
-                    ),
-                    title: Text('Create group with ${user.username}'),
-                  ),
-                  const SizedBox(height: 20),
-                  // Thick line
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 1,
-                        color: context.theme.thicktopline,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Text(
+                          'No groups in common',
+                          style: TextStyle(
+                            color: context.theme.greyColor,
+                            fontFamily: 'Arial',
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
-                      Container(
-                        height: 8,
-                        color: context.theme.thickbottomline,
+                      ListTile(
+                        leading: CustomIconButton(
+                          onPressed: () {},
+                          icon: Icons.group_outlined,
+                          background: Coloors.greenDark,
+                          iconColor: Colors.black,
+                          iconSize: 32,
+                        ),
+                        title: Text(
+                          'Create group with ${user.username}',
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(left: 25, right: 10),
-                    leading: const Icon(
-                      Icons.block,
-                      color: Color(0xFFF15C6D),
-                    ),
-                    title: Text(
-                      'Block ${user.username}',
-                      style: const TextStyle(
-                        color: Color(0xFFF15C6D),
+                      // Thick line
+                      Column(
+                        children: [
+                          Container(
+                            height: 1,
+                            color: context.theme.thicktopline,
+                          ),
+                          Container(
+                            height: 8,
+                            color: context.theme.thickbottomline,
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(left: 25, right: 10),
-                    leading: const Icon(
-                      Icons.thumb_down,
-                      color: Color(0xFFF15C6D),
-                    ),
-                    title: Text(
-                      'Report ${user.username}',
-                      style: const TextStyle(
-                        color: Color(0xFFF15C6D),
+                      ListTile(
+                        contentPadding:
+                            const EdgeInsets.only(left: 25, right: 10),
+                        leading: const Icon(
+                          Icons.block,
+                          color: Color(0xFFF15C6D),
+                        ),
+                        title: Text(
+                          'Block ${user.username}',
+                          style: const TextStyle(
+                            color: Color(0xFFF15C6D),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  // Thick line
-                  Column(
-                    children: [
-                      Container(
-                        height: 1,
-                        color: context.theme.thicktopline,
+                      ListTile(
+                        contentPadding:
+                            const EdgeInsets.only(left: 25, right: 10),
+                        leading: const Icon(
+                          Icons.thumb_down,
+                          color: Color(0xFFF15C6D),
+                        ),
+                        title: Text(
+                          'Report ${user.username}',
+                          style: const TextStyle(
+                            color: Color(0xFFF15C6D),
+                          ),
+                        ),
                       ),
-                      Container(
-                        height: 150,
-                        color: context.theme.thickbottomline,
+                      // Thick line
+                      Column(
+                        children: [
+                          Container(
+                            height: 1,
+                            color: context.theme.thicktopline,
+                          ),
+                          Container(
+                            height: 150,
+                            color: context.theme.thickbottomline,
+                          ),
+                        ],
                       ),
                     ],
                   ),
