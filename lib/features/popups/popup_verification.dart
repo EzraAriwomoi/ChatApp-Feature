@@ -4,7 +4,7 @@ import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 
 class PopupVerification {
   static void showVerificationPopup(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController texteditingcontroller = TextEditingController();
 
     showDialog(
       context: context,
@@ -28,8 +28,8 @@ class PopupVerification {
                       topRight: Radius.circular(10),
                     ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 36),
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 36),
                     child: Text(
                       'Enter your two-step verification PIN',
                       style: TextStyle(
@@ -41,7 +41,7 @@ class PopupVerification {
                     ),
                   ),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -49,40 +49,40 @@ class PopupVerification {
                       // TextField
                       Center(
                         child: SizedBox(
-                          width: 165, // Adjust width to reduce size
+                          width: 165,
                           child: TextField(
-                            controller: _controller,
+                            controller: texteditingcontroller,
                             textAlign: TextAlign.center,
                             obscureText: true,
                             obscuringCharacter: '*',
                             style: const TextStyle(
-                              fontSize: 22, // Adjust font size to fit better
+                              fontSize: 22,
                               letterSpacing: 3,
                             ),
                             cursorColor: Colors.green,
                             cursorHeight: 23,
                             decoration: InputDecoration(
-                              hintText: _getHintText(_controller),
+                              hintText: _getHintText(texteditingcontroller),
                               hintStyle: TextStyle(
                                 fontSize: 22,
                                 color: context.theme.greyColor,
                                 letterSpacing: 3,
                               ),
-                              enabledBorder: UnderlineInputBorder(
+                              enabledBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.green,
-                                  width: 2.0, // Adjust underline thickness
+                                  width: 2.0,
                                 ),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.green,
-                                  width: 2.0, // Adjust underline thickness
+                                  width: 2.0,
                                 ),
                               ),
-                              contentPadding: EdgeInsets.only(top: 4, bottom: 0), // Adjust padding to reduce gap
+                              contentPadding: const EdgeInsets.only(top: 4, bottom: 0),
                               isDense: true,
-                              counterText: '', // Removes 0/6 counter
+                              counterText: '',
                             ),
                             keyboardType: TextInputType.number,
                             maxLength: 6,
@@ -92,9 +92,8 @@ class PopupVerification {
 
                       const SizedBox(height: 20),
 
-                      // Text below TextField
                       Padding(
-                        padding: EdgeInsets.only(left: 0),
+                        padding: const EdgeInsets.only(left: 0),
                         child: RichText(
                           text: TextSpan(
                             children: [
@@ -109,7 +108,7 @@ class PopupVerification {
                               ),
                               TextSpan(
                                 text: 'Forgot PIN?',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.green,
                                   fontSize: 13.5,
                                   fontFamily: 'Arial',
@@ -134,7 +133,7 @@ class PopupVerification {
       },
     ).then((_) {
       // Clear the controller when the dialog is closed
-      _controller.clear();
+      texteditingcontroller.clear();
     });
   }
 
@@ -150,11 +149,10 @@ class PopupVerification {
           child: SizedBox(
             width: 550,
             child: Padding(
-              padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0), // Remove unnecessary padding
+              padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
-                  // Message
                   Padding(
                     padding: const EdgeInsets.only(left: 0, top: 0),
                     child: Text(
@@ -168,9 +166,9 @@ class PopupVerification {
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  
-                  // Buttons
+
+                  const SizedBox(height: 16),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -179,7 +177,7 @@ class PopupVerification {
                         onPressed: () {
                           Navigator.of(context).pop(); // Close the dialog
                         },
-                        child: Text(
+                        child: const Text(
                           'Cancel',
                           style: TextStyle(
                             color: Colors.green,
@@ -189,14 +187,15 @@ class PopupVerification {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10), // Spacer between buttons
+
+                      const SizedBox(width: 10),
                       
                       // Turn Off Button
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
+                          //logic here
                         },
-                        child: Text(
+                        child: const Text(
                           'Turn off',
                           style: TextStyle(
                             color: Colors.green,
@@ -218,14 +217,11 @@ class PopupVerification {
   );
 }
 
-
   // Function to generate hint text based on current input length
   static String _getHintText(TextEditingController controller) {
     final String currentInput = controller.text;
     final int length = currentInput.length;
-    final String hint = '* * *   * * *';
-
-    // Replace asterisks with spaces based on input length
+    const String hint = '* * *   * * *';
     return hint.replaceRange(0, length, ' ' * length);
   }
 }
