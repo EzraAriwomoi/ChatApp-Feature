@@ -13,6 +13,7 @@ import 'package:ult_whatsapp/pages/Home/status_homepage.dart';
 import 'package:ult_whatsapp/features/auth/auth_controller.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ult_whatsapp/pages/widgets/camera_screen.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -56,27 +57,32 @@ class _HomePageState extends ConsumerState<HomePage> {
   Future<void> _initializeCamera() async {
     cameras = await availableCameras();
     if (cameras != null && cameras!.isNotEmpty) {
-      cameraController = CameraController(cameras![0], ResolutionPreset.medium);
+      cameraController = CameraController(cameras![0], ResolutionPreset.high);
       await cameraController?.initialize();
     }
   }
 
   Future<void> _openCamera() async {
-    if (await Permission.camera.request().isGranted) {
-      if (cameraController != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CameraPreview(cameraController!),
-          ),
-        );
-      }
+  // Request camera permission
+  if (await Permission.camera.request().isGranted) {
+    if (cameraController != null && cameraController!.value.isInitialized) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CameraScreen(cameraController: cameraController),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera permission denied')),
+        const SnackBar(content: Text('Camera is not initialized')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Camera permission denied')),
+    );
   }
+}
 
   void _onItemTapped(int index) {
     setState(() {
@@ -246,7 +252,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   if (selected == 5) {
                     Navigator.pushNamed(context, "settings");
                   } else if (selected == 6) {
-                    PopupVerification.showVerificationPopup(context); // Show the popup
+                    PopupVerification.showVerificationPopup(context);
                   }
                 },
                 icon: Icon(
