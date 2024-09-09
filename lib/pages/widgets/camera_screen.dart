@@ -61,7 +61,6 @@ class _CameraScreenState extends State<CameraScreen>
 
   void _toggleFlash() {
     if (isFrontCamera) {
-      // Toggle between 'off' and 'torch' modes only for front camera
       setState(() {
         _flashMode =
             (_flashMode == FlashMode.off) ? FlashMode.torch : FlashMode.off;
@@ -139,62 +138,47 @@ class _CameraScreenState extends State<CameraScreen>
     });
   }
 
+  void _handleHorizontalSwipe(DragEndDetails details) {
+    if (details.velocity.pixelsPerSecond.dx > 0) {
+      // Swiped right
+      if (!isVideoMode) _switchToVideoMode();
+    } else {
+      // Swiped left
+      if (isVideoMode) _switchToPhotoMode();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: widget.cameraController != null &&
-                    widget.cameraController!.value.isInitialized
-                ? AspectRatio(
-                    aspectRatio: widget.cameraController!.value.aspectRatio,
-                    child: Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()
-                        ..scale(isFrontCamera ? -1.0 : 1.0, 1.0, 1.0),
-                      child: CameraPreview(widget.cameraController!),
-                    ),
-                  )
-                : Container(
-                    color: Colors.black,
-                  ),
-          ),
-          SafeArea(
-            child: Stack(
-              children: [
-                // Close button
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color.fromARGB(255, 13, 21, 26)
-                          .withOpacity(0.4),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 24,
+      body: GestureDetector(
+        onHorizontalDragEnd: _handleHorizontalSwipe,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: widget.cameraController != null &&
+                      widget.cameraController!.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: widget.cameraController!.value.aspectRatio,
+                      child: Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..scale(isFrontCamera ? -1.0 : 1.0, 1.0, 1.0),
+                        child: CameraPreview(widget.cameraController!),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                    )
+                  : Container(
+                      color: Colors.black,
                     ),
-                  ),
-                ),
-
-                // Flashlight toggle
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: GestureDetector(
-                    onTap: _toggleFlash,
+            ),
+            SafeArea(
+              child: Stack(
+                children: [
+                  // Close button
+                  Positioned(
+                    top: 12,
+                    left: 12,
                     child: Container(
                       width: 40,
                       height: 40,
@@ -203,214 +187,268 @@ class _CameraScreenState extends State<CameraScreen>
                         color: const Color.fromARGB(255, 13, 21, 26)
                             .withOpacity(0.4),
                       ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 100),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0.0, -1.0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
-                        child: Icon(
-                          key: ValueKey(_flashMode),
-                          isFrontCamera
-                              ? (_flashMode == FlashMode.off
-                                  ? Icons.flash_off_rounded
-                                  : Icons.flash_on_rounded)
-                              : (_flashMode == FlashMode.off
-                                  ? Icons.flash_off_rounded
-                                  : _flashMode == FlashMode.torch
-                                      ? Icons.flash_on_rounded
-                                      : Icons.flash_auto_rounded),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.close,
                           color: Colors.white,
                           size: 24,
                         ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
                   ),
-                ),
 
-                // Photo upload
-                Positioned(
-                  bottom: 134,
-                  left: 12,
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color.fromARGB(255, 13, 21, 26)
-                          .withOpacity(0.4),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.photo_outlined,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        // photo upload functionality
-                      },
-                    ),
-                  ),
-                ),
-
-                // Capture button
-                Positioned(
-                  bottom: 125,
-                  left: MediaQuery.of(context).size.width * 0.5 - 35,
-                  child: GestureDetector(
-                    onTap: !isVideoMode ? _captureOrRecord : null,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer border
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
+                  // Video timer
+                  if (isVideoMode)
+                    Positioned(
+                      top: 12,
+                      left: MediaQuery.of(context).size.width * 0.5 - 30,
+                      child: Container(
+                        width: 60,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: const Color.fromARGB(255, 13, 21, 26)
+                            .withOpacity(0.4),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '00:00',
+                            style: TextStyle(
                               color: Colors.white,
-                              width: 5,
+                              fontSize: 14,
+                              fontFamily: 'Arial',
                             ),
                           ),
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          width: isVideoMode ? 33 : 50,
-                          height: isVideoMode ? 33 : 50,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
+                      ),
+                    ),
+
+                  // Flashlight toggle
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: _toggleFlash,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color.fromARGB(255, 13, 21, 26)
+                              .withOpacity(0.4),
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 100),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0.0, -1.0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            );
+                          },
+                          child: Icon(
+                            key: ValueKey(_flashMode),
+                            isFrontCamera
+                                ? (_flashMode == FlashMode.off
+                                    ? Icons.flash_off_rounded
+                                    : Icons.flash_on_rounded)
+                                : (_flashMode == FlashMode.off
+                                    ? Icons.flash_off_rounded
+                                    : _flashMode == FlashMode.torch
+                                        ? Icons.flash_on_rounded
+                                        : Icons.flash_auto_rounded),
                             color: Colors.white,
+                            size: 24,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
 
-                // Switch to selfie
-                Positioned(
-                  bottom: 134,
-                  right: 12,
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color.fromARGB(255, 13, 21, 26)
-                          .withOpacity(0.4),
-                    ),
-                    child: AnimatedBuilder(
-                      animation: _rotationController,
-                      builder: (context, child) {
-                        return Transform.rotate(
-                          angle:
-                              _rotationController.value * 1.0 * 3.1415927, // 2π
-                          child: child,
-                        );
-                      },
+                  // Photo upload
+                  Positioned(
+                    bottom: 134,
+                    left: 12,
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color.fromARGB(255, 13, 21, 26)
+                            .withOpacity(0.4),
+                      ),
                       child: IconButton(
                         icon: const Icon(
-                          Icons.loop_rounded,
+                          Icons.photo_outlined,
                           color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: _switchCamera,
+                        onPressed: () {
+                          // photo upload functionality
+                        },
                       ),
                     ),
                   ),
-                ),
 
-                // Mode switch buttons
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    color: Colors.black,
-                    height: 110,
-                    child: Stack(
-                      children: [
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 300),
-                          left: isVideoMode
-                              ? MediaQuery.of(context).size.width * 0.42
-                              : MediaQuery.of(context).size.width * 0.25,
-                          top: 0,
-                          bottom: 40,
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: _switchToVideoMode,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: isVideoMode
-                                      ? const Color.fromARGB(255, 22, 22, 22)
-                                      : Colors.transparent,
-                                ),
-                                child: Text(
-                                  "Video",
-                                  style: TextStyle(
-                                    color: isVideoMode
-                                        ? Colors.white
-                                        : Colors.white70,
-                                    fontFamily: 'Arial',
-                                    fontSize: 14,
-                                  ),
-                                ),
+                  // Capture button
+                  Positioned(
+                    bottom: 125,
+                    left: MediaQuery.of(context).size.width * 0.5 - 35,
+                    child: GestureDetector(
+                      onTap: !isVideoMode ? _captureOrRecord : null,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Outer border
+                          Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 5,
                               ),
                             ),
                           ),
-                        ),
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 300),
-                          right: isVideoMode
-                              ? MediaQuery.of(context).size.width * 0.25
-                              : MediaQuery.of(context).size.width * 0.42,
-                          top: 0,
-                          bottom: 40,
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: _switchToPhotoMode,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: !isVideoMode
-                                      ? const Color.fromARGB(255, 22, 22, 22)
-                                      : Colors.transparent,
-                                ),
-                                child: Text(
-                                  "Photo",
-                                  style: TextStyle(
-                                    color: !isVideoMode
-                                        ? Colors.white
-                                        : Colors.white70,
-                                    fontFamily: 'Arial',
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            width: isVideoMode ? 33 : 50,
+                            height: isVideoMode ? 33 : 50,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+
+                  // Switch to selfie
+                  Positioned(
+                    bottom: 134,
+                    right: 12,
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color.fromARGB(255, 13, 21, 26)
+                            .withOpacity(0.4),
+                      ),
+                      child: AnimatedBuilder(
+                        animation: _rotationController,
+                        builder: (context, child) {
+                          return Transform.rotate(
+                            angle:
+                                _rotationController.value * 1.0 * 3.1415927, // 2π
+                            child: child,
+                          );
+                        },
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.loop_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          onPressed: _switchCamera,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Mode switch buttons
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.black,
+                      height: 110,
+                      child: Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            left: isVideoMode
+                                ? MediaQuery.of(context).size.width * 0.42
+                                : MediaQuery.of(context).size.width * 0.25,
+                            top: 0,
+                            bottom: 40,
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: _switchToVideoMode,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: isVideoMode
+                                        ? const Color.fromARGB(255, 22, 22, 22)
+                                        : Colors.transparent,
+                                  ),
+                                  child: Text(
+                                    "Video",
+                                    style: TextStyle(
+                                      color: isVideoMode
+                                          ? Colors.white
+                                          : Colors.white70,
+                                      fontFamily: 'Arial',
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            right: isVideoMode
+                                ? MediaQuery.of(context).size.width * 0.25
+                                : MediaQuery.of(context).size.width * 0.42,
+                            top: 0,
+                            bottom: 40,
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: _switchToPhotoMode,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: !isVideoMode
+                                        ? const Color.fromARGB(255, 22, 22, 22)
+                                        : Colors.transparent,
+                                  ),
+                                  child: Text(
+                                    "Photo",
+                                    style: TextStyle(
+                                      color: !isVideoMode
+                                          ? Colors.white
+                                          : Colors.white70,
+                                      fontFamily: 'Arial',
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
