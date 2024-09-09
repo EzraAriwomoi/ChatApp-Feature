@@ -1,32 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
+// ignore: must_be_immutable
 class CameraScreen extends StatefulWidget {
-  final CameraController? cameraController;
-  const CameraScreen({super.key, this.cameraController});
+  CameraController? cameraController;
+  CameraScreen({super.key, this.cameraController});
 
   @override
   // ignore: library_private_types_in_public_api
   _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _CameraScreenState extends State<CameraScreen>
+    with SingleTickerProviderStateMixin {
   FlashMode _flashMode = FlashMode.off;
   bool isRecording = false;
   bool isVideoMode = false;
+  bool isFrontCamera = false;
+  late AnimationController _rotationController;
+  List<CameraDescription> _cameras = [];
+  CameraDescription? _currentCamera;
 
-  // Flash mode toggle function
-  void _toggleFlash() {
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _initializeCameras();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeCameras() async {
+    final cameras = await availableCameras();
     setState(() {
-      // Cycle through the 3 modes: off -> on -> auto -> off...
-      if (_flashMode == FlashMode.off) {
-        _flashMode = FlashMode.torch;
-      } else if (_flashMode == FlashMode.torch) {
-        _flashMode = FlashMode.auto;
-      } else {
-        _flashMode = FlashMode.off;
+      _cameras = cameras;
+      _currentCamera = _cameras.isNotEmpty ? _cameras.first : null;
+      isFrontCamera =
+          _currentCamera?.lensDirection == CameraLensDirection.front;
+      if (_currentCamera != null) {
+        widget.cameraController =
+            CameraController(_currentCamera!, ResolutionPreset.high);
+        widget.cameraController?.initialize().then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        }).catchError((error) {
+          // print('Error initializing camera: $error');
+        });
       }
     });
+  }
+
+  void _toggleFlash() {
+    if (isFrontCamera) {
+      // Toggle between 'off' and 'torch' modes only for front camera
+      setState(() {
+        _flashMode =
+            (_flashMode == FlashMode.off) ? FlashMode.torch : FlashMode.off;
+      });
+    } else {
+      // Cycle through 'off' -> 'torch' -> 'auto' -> 'off' for back camera
+      setState(() {
+        if (_flashMode == FlashMode.off) {
+          _flashMode = FlashMode.torch;
+        } else if (_flashMode == FlashMode.torch) {
+          _flashMode = FlashMode.auto;
+        } else {
+          _flashMode = FlashMode.off;
+        }
+      });
+    }
 
     widget.cameraController?.setFlashMode(_flashMode);
   }
@@ -46,17 +97,45 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  // Switch to Photo Mode
   void _switchToPhotoMode() {
     setState(() {
       isVideoMode = false;
     });
   }
 
-  // Switch to Video Mode
   void _switchToVideoMode() {
     setState(() {
       isVideoMode = true;
+    });
+  }
+
+  Future<void> _switchCamera() async {
+    if (_cameras.length < 2) return;
+
+    final newCamera = _cameras.firstWhere(
+      (camera) =>
+          camera.lensDirection !=
+          (_currentCamera?.lensDirection ?? CameraLensDirection.back),
+      orElse: () => _cameras.first,
+    );
+
+    setState(() {
+      _currentCamera = newCamera;
+      isFrontCamera = newCamera.lensDirection == CameraLensDirection.front;
+    });
+
+    _rotationController.forward().then((_) {
+      _rotationController.reverse();
+    });
+
+    widget.cameraController =
+        CameraController(_currentCamera!, ResolutionPreset.high);
+    widget.cameraController?.initialize().then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    }).catchError((error) {
+      // print('Error initializing camera: $error');
     });
   }
 
@@ -66,15 +145,22 @@ class _CameraScreenState extends State<CameraScreen> {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // Camera Preview
           Positioned.fill(
-            child: widget.cameraController != null
-                ? CameraPreview(widget.cameraController!)
+            child: widget.cameraController != null &&
+                    widget.cameraController!.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: widget.cameraController!.value.aspectRatio,
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..scale(isFrontCamera ? -1.0 : 1.0, 1.0, 1.0),
+                      child: CameraPreview(widget.cameraController!),
+                    ),
+                  )
                 : Container(
                     color: Colors.black,
                   ),
           ),
-
           SafeArea(
             child: Stack(
               children: [
@@ -119,7 +205,8 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 100),
-                        transitionBuilder: (Widget child, Animation<double> animation) {
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
                           return SlideTransition(
                             position: Tween<Offset>(
                               begin: const Offset(0.0, -1.0),
@@ -130,15 +217,44 @@ class _CameraScreenState extends State<CameraScreen> {
                         },
                         child: Icon(
                           key: ValueKey(_flashMode),
-                          _flashMode == FlashMode.off
-                              ? Icons.flash_off_rounded
-                              : _flashMode == FlashMode.torch
-                                  ? Icons.flash_on_rounded
-                                  : Icons.flash_auto_rounded,
+                          isFrontCamera
+                              ? (_flashMode == FlashMode.off
+                                  ? Icons.flash_off_rounded
+                                  : Icons.flash_on_rounded)
+                              : (_flashMode == FlashMode.off
+                                  ? Icons.flash_off_rounded
+                                  : _flashMode == FlashMode.torch
+                                      ? Icons.flash_on_rounded
+                                      : Icons.flash_auto_rounded),
                           color: Colors.white,
                           size: 24,
                         ),
                       ),
+                    ),
+                  ),
+                ),
+
+                // Photo upload
+                Positioned(
+                  bottom: 134,
+                  left: 12,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color.fromARGB(255, 13, 21, 26)
+                          .withOpacity(0.4),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.photo_outlined,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      onPressed: () {
+                        // photo upload functionality
+                      },
                     ),
                   ),
                 ),
@@ -164,9 +280,10 @@ class _CameraScreenState extends State<CameraScreen> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 50,
-                          height: 50,
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: isVideoMode ? 33 : 50,
+                          height: isVideoMode ? 33 : 50,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
@@ -176,6 +293,40 @@ class _CameraScreenState extends State<CameraScreen> {
                     ),
                   ),
                 ),
+
+                // Switch to selfie
+                Positioned(
+                  bottom: 134,
+                  right: 12,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color.fromARGB(255, 13, 21, 26)
+                          .withOpacity(0.4),
+                    ),
+                    child: AnimatedBuilder(
+                      animation: _rotationController,
+                      builder: (context, child) {
+                        return Transform.rotate(
+                          angle:
+                              _rotationController.value * 1.0 * 3.1415927, // 2π
+                          child: child,
+                        );
+                      },
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.loop_rounded,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: _switchCamera,
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Mode switch buttons
                 Positioned(
                   bottom: 0,
