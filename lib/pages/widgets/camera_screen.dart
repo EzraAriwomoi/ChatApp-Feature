@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
@@ -25,7 +25,7 @@ class _CameraScreenState extends State<CameraScreen>
   late AnimationController _rotationController;
   List<CameraDescription> _cameras = [];
   CameraDescription? _currentCamera;
-  List<XFile> _galleryImages = [];
+  List<File> _galleryImages = [];
 
   Timer? _timer;
   int _elapsedTime = 0;
@@ -43,16 +43,30 @@ class _CameraScreenState extends State<CameraScreen>
     _fetchGalleryImages();
   }
 
-  // Function to fetch images from the gallery
-  Future<void> _fetchGalleryImages() async {
-    final ImagePicker picker = ImagePicker();
-    final List<XFile>? pickedFiles = await picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _galleryImages = pickedFiles;
-      });
+  Future<List<File>> _getImagesFromStorage() async {
+  final directory = await getExternalStorageDirectory();
+  if (directory != null) {
+    final imageDirectory = Directory(directory.path);
+    final List<File> imageFiles = [];
+    final List<FileSystemEntity> files = imageDirectory.listSync();
+    
+    for (var file in files) {
+      if (file is File && (file.path.endsWith('.jpg') || file.path.endsWith('.png'))) {
+        imageFiles.add(file);
+      }
     }
+    
+    return imageFiles;
   }
+  return [];
+}
+
+Future<void> _fetchGalleryImages() async {
+  final images = await _getImagesFromStorage();
+  setState(() {
+    _galleryImages = images;
+  });
+}
 
   @override
   void dispose() {
@@ -66,6 +80,7 @@ class _CameraScreenState extends State<CameraScreen>
     await [
       Permission.camera,
       Permission.microphone,
+      Permission.storage,
     ].request();
   }
 
@@ -284,28 +299,27 @@ class _CameraScreenState extends State<CameraScreen>
 
                   if (_galleryImages.isNotEmpty)
                     Positioned(
-                      top: 80, // Adjust the positioning as per your needs
+                      top: 80,
                       left: 12,
                       right: 12,
-                      child: Container(
-                        height: 60, // The height of each square (adjust as needed)
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
+                      child: SizedBox(
+                        height: 200,
+                        child: GridView.builder(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3, // Number of columns
+                            crossAxisSpacing: 8.0, // Spacing between columns
+                            mainAxisSpacing: 8.0, // Spacing between rows
+                          ),
                           itemCount: _galleryImages.length,
                           itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 10), // 1 cm gap (approx 10 pixels)
-                              child: Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white),
-                                ),
-                                child: Image.file(
-                                  File(_galleryImages[index].path),
-                                  fit: BoxFit.cover,
-                                ),
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white),
+                              ),
+                              child: Image.file(
+                                _galleryImages[index],
+                                fit: BoxFit.cover,
                               ),
                             );
                           },
