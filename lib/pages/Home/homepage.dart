@@ -360,7 +360,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       isSelected: _selectedIndex == 0,
                     ),
                     _buildBottomNavigationBarItem(
-                      icon: Icons.blur_circular_outlined,
+                      icon: Icons.motion_photos_on_rounded,
                       label: 'Status',
                       isSelected: _selectedIndex == 1,
                     ),
