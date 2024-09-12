@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 
 void showEndToEndBottomSheet(BuildContext context) {
@@ -180,8 +181,16 @@ void showEndToEndBottomSheet(BuildContext context) {
                       // Learn More Button
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Action for Learn More button https://www.whatsapp.com/security
+                          onPressed: () async {
+                            const url = 'https://www.whatsapp.com/security';
+                            final Uri uri = Uri.parse(url);
+
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri,
+                                  mode: LaunchMode.externalApplication);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
