@@ -10,6 +10,8 @@ import 'package:ult_whatsapp/common/routes/routes.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
 import 'package:ult_whatsapp/features/chat/repository/chat_repository.dart';
 
+import '../../features/popups/end_to_end_encrypted.dart';
+
 final newContactsLoadingProvider = StateProvider<bool>((ref) => false);
 
 navigateToContactPage(context) {
@@ -202,7 +204,7 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                         const SizedBox(width: 5),
                         GestureDetector(
                           onTap: () {
-                            _showBottomSheet(context);
+                            showEndToEndBottomSheet(context);
                           },
                           child: const Text(
                             "end-to-end encrypted",
