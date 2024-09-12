@@ -202,7 +202,7 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                         const SizedBox(width: 5),
                         GestureDetector(
                           onTap: () {
-                            // Handle link tap
+                            _showBottomSheet(context);
                           },
                           child: const Text(
                             "end-to-end encrypted",
