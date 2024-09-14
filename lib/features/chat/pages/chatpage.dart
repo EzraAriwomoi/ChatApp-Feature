@@ -303,7 +303,10 @@ class _ChatAppBarState extends State<ChatAppBar> {
         },
         borderRadius: BorderRadius.circular(20),
         child: Row(children: [
-          Icon(Icons.arrow_back,color: context.theme.baricons),
+          Icon(
+            Icons.arrow_back,
+            color: context.theme.baricons,
+          ),
           Hero(
             tag: 'profile',
             child: Container(
@@ -328,7 +331,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+          padding: const EdgeInsets.symmetric(vertical: 5),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
@@ -338,7 +341,6 @@ class _ChatAppBarState extends State<ChatAppBar> {
                 color: context.theme.baricons,
               ),
             ),
-            const SizedBox(height: 3),
             AnimatedOpacity(
               opacity: _lastSeen.isNotEmpty ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 300),
@@ -457,8 +459,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                         style: TextStyle(fontSize: 12.0),
                       ),
                       Icon(
-                        Icons
-                            .arrow_right_outlined,
+                        Icons.arrow_right_outlined,
                         size: 20.0,
                         color: Colors.grey,
                       ),
