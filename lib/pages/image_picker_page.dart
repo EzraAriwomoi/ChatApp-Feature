@@ -5,129 +5,203 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import '../common/widgets/custom_icon_button.dart';
 
-class ImagePickerPage extends StatefulWidget {
-  const ImagePickerPage({super.key});
+class ImagePickerSheet extends StatefulWidget {
+  const ImagePickerSheet({super.key});
 
   @override
-  State<ImagePickerPage> createState() => _ImagePickerPageState();
+  State<ImagePickerSheet> createState() => _ImagePickerSheetState();
 }
 
-class _ImagePickerPageState extends State<ImagePickerPage> {
-  List<Widget> imageList = [];
+class _ImagePickerSheetState extends State<ImagePickerSheet>
+    with SingleTickerProviderStateMixin {
+  List<Widget> mediaList = [];
   int currentPage = 0;
   int? lastPage;
+  late TabController _tabController;
 
-  handleScrollEvent(ScrollNotification scroll) {
-    if (scroll.metrics.pixels / scroll.metrics.maxScrollExtent <= .33) return;
-    if (currentPage == lastPage) return;
-    fetchAllImages();
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    fetchAllMedia();
   }
 
-  fetchAllImages() async {
+  Future<void> fetchAllMedia() async {
     lastPage = currentPage;
     final permission = await PhotoManager.requestPermissionExtend();
     if (!permission.isAuth) return PhotoManager.openSetting();
 
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
-      type: RequestType.image,
+      type: RequestType.all,
       onlyAll: true,
     );
 
-    List<AssetEntity> photos = await albums[0].getAssetListPaged(
+    List<AssetEntity> media = await albums[0].getAssetListPaged(
       page: currentPage,
       size: 24,
     );
 
     List<Widget> temp = [];
 
-    for (var asset in photos) {
-      temp.add(
-        FutureBuilder(
-          future: asset.thumbnailDataWithSize(
-            const ThumbnailSize(200, 200),
-          ),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: InkWell(
-                  onTap: () => Navigator.pop(context, snapshot.data),
+    for (var asset in media) {
+      if (asset.type == AssetType.image || asset.type == AssetType.video) {
+        temp.add(
+          FutureBuilder(
+            future: asset.thumbnailDataWithSize(
+              const ThumbnailSize(200, 200),
+            ),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return ClipRRect(
                   borderRadius: BorderRadius.circular(5),
-                  splashFactory: NoSplash.splashFactory,
-                  child: Container(
-                    margin: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: context.theme.greyColor!.withOpacity(.4),
-                        width: 1,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context, snapshot.data),
+                    borderRadius: BorderRadius.circular(5),
+                    splashFactory: NoSplash.splashFactory,
+                    child: Container(
+                      margin: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: context.theme.barcolor!.withOpacity(0.0),
+                        ),
+                        image: DecorationImage(
+                          image: MemoryImage(snapshot.data as Uint8List),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      image: DecorationImage(
-                        image: MemoryImage(snapshot.data as Uint8List),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                ),
-              );
-            }
-            return const SizedBox();
-          },
-        ),
-      );
+                );
+              }
+              return const SizedBox();
+            },
+          ),
+        );
+      }
     }
 
     setState(() {
-      imageList.addAll(temp);
+      mediaList.addAll(temp);
       currentPage++;
     });
   }
 
-  @override
-  void initState() {
-    fetchAllImages();
-    super.initState();
+  void handleScrollEvent(ScrollNotification scroll) {
+    if (scroll.metrics.pixels / scroll.metrics.maxScrollExtent <= .33) return;
+    if (currentPage == lastPage) return;
+    fetchAllMedia();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          leading: CustomIconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icons.arrow_back,
-          ),
-          title: Text(
-            'Ult WhatsApp',
-            style: TextStyle(
-              color: context.theme.authAppbarTextColor,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.952,
+      minChildSize: 0.5,
+      maxChildSize: 0.952,
+      expand: false,
+      builder: (BuildContext context, ScrollController scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(34)),
+          child: Scaffold(
+            backgroundColor: context.theme.barcolor,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(136.0),
+              child: AppBar(
+                backgroundColor: context.theme.barcolor,
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 36.0),
+                  child: CustomIconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icons.close,
+                    iconSize: 24,
+                  ),
+                ),
+                title: Padding(
+                  padding: const EdgeInsets.only(top: 45.0),
+                  child: Text(
+                    'Send to',
+                    style: TextStyle(
+                      color: context.theme.authAppbarTextColor,
+                      fontFamily: 'Arial',
+                      fontSize: 23,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 34.0),
+                    child: CustomIconButton(
+                      onPressed: () {},
+                      icon: Icons.check_box_outlined,
+                      iconSize: 24,
+                    ),
+                  ),
+                ],
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(30.0),
+                  child: TabBar(
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(text: 'Recents'),
+                      Tab(text: 'Gallery'),
+                    ],
+                    labelStyle: const TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 16,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            body: ScrollConfiguration(
+              behavior: NoStretchScrollBehavior(),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Recents
+                  Padding(
+                    padding: const EdgeInsets.all(0),
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (scroll) {
+                        handleScrollEvent(scroll);
+                        return true;
+                      },
+                      child: GridView.builder(
+                        controller: scrollController,
+                        itemCount: mediaList.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                        ),
+                        itemBuilder: (_, index) {
+                          return mediaList[index];
+                        },
+                      ),
+                    ),
+                  ),
+                  // Gallery View
+                  const Center(child: Text('Gallery View Content')),
+                ],
+              ),
             ),
           ),
-          actions: [
-            CustomIconButton(
-              onPressed: () {},
-              icon: Icons.more_vert,
-            ),
-          ]),
-      body: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: NotificationListener(
-          onNotification: (ScrollNotification scroll) {
-            handleScrollEvent(scroll);
-            return true;
-          },
-          child: GridView.builder(
-            itemCount: imageList.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-            ),
-            itemBuilder: (_, index) {
-              return imageList[index];
-            },
-          ),
-        ),
-      ),
+        );
+      },
     );
+  }
+}
+
+class NoStretchScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildScrollbar(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // Removes the stretching effect
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics(); // Removes the iOS-style bouncing effect
   }
 }

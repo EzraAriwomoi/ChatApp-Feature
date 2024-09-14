@@ -96,7 +96,7 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
                 final image = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ImagePickerPage(),
+                    builder: (context) => const ImagePickerSheet(),
                   ),
                 );
                 if (image == null) return;

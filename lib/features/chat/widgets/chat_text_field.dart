@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,18 +83,17 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
   }
 
   void sendImageMessageFromGallery() async {
-    final image = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ImagePickerPage(),
-      ),
-    );
+  final image = await showModalBottomSheet<Uint8List>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => const ImagePickerSheet(),
+  );
 
-    if (image != null) {
-      sendFileMessage(image, MessageType.image);
-      _toggleCard();
-    }
+  if (image != null) {
+    sendFileMessage(image, MessageType.image);
+    _toggleCard();
   }
+}
 
   void sendFileMessage(var file, MessageType messageType) async {
     ref.read(chatControllerProvider).sendFileMessage(
@@ -218,7 +219,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                             children: [
                               iconWithText(
                                 onPressed: () {},
-                                icon: Icons.description_outlined,
+                                icon: Icons.insert_drive_file_outlined,
                                 text: 'Document',
                                 background: const Color(0xFF7F66FE),
                               ),
@@ -248,13 +249,13 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                               ),
                               iconWithText(
                                 onPressed: () {},
-                                icon: Icons.location_on,
+                                icon: Icons.location_on_rounded,
                                 text: 'Location',
                                 background: const Color(0xFF1FA855),
                               ),
                               iconWithText(
                                 onPressed: () {},
-                                icon: Icons.person,
+                                icon: Icons.person_rounded,
                                 text: 'Contact',
                                 background: const Color(0xFF009DE1),
                               ),
@@ -267,7 +268,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                               const SizedBox(width: 50),
                               iconWithText(
                                 onPressed: () {},
-                                icon: Icons.graphic_eq_outlined,
+                                icon: Icons.align_horizontal_left_rounded,
                                 text: 'Poll',
                                 background:
                                     const Color.fromARGB(255, 37, 158, 138),

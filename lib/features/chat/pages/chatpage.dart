@@ -53,125 +53,128 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     return Scaffold(
       backgroundColor: context.theme.chatPageBgColor,
       appBar: ChatAppBar(user: widget.user),
-      body: Stack(children: [
-        // Chat background image
-        Image(
-          height: double.maxFinite,
-          width: double.maxFinite,
-          image: const AssetImage('assets/doodle_bg.png'),
-          fit: BoxFit.cover,
-          color: context.theme.chatPageDoodleColor,
-        ),
-        // Stream of Chat
-        Padding(
-          padding: const EdgeInsets.only(bottom: 60),
-          child: StreamBuilder<List<MessageModel>>(
-            stream: ref
-                .watch(chatControllerProvider)
-                .getAllOneToOneMessage(widget.user.uid),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.active) {
-                return ListView.builder(
-                  itemCount: 15,
-                  itemBuilder: (_, index) {
-                    final random = Random().nextInt(14);
-                    return Container(
-                      alignment: random.isEven
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      margin: EdgeInsets.only(
-                        top: 5,
-                        bottom: 5,
-                        left: random.isEven ? 150 : 15,
-                        right: random.isEven ? 15 : 150,
-                      ),
-                      child: ClipPath(
-                        clipper: UpperNipMessageClipperTwo(
-                          random.isEven
-                              ? MessageType.send
-                              : MessageType.receive,
-                          nipWidth: 8,
-                          nipHeight: 10,
-                          bubbleRadius: 12,
+      body: ScrollConfiguration(
+        behavior: NoStretchScrollBehavior(),
+        child: Stack(children: [
+          // Chat background image
+          Image(
+            height: double.maxFinite,
+            width: double.maxFinite,
+            image: const AssetImage('assets/doodle_bg.png'),
+            fit: BoxFit.cover,
+            color: context.theme.chatPageDoodleColor,
+          ),
+          // Stream of Chat
+          Padding(
+            padding: const EdgeInsets.only(bottom: 60),
+            child: StreamBuilder<List<MessageModel>>(
+              stream: ref
+                  .watch(chatControllerProvider)
+                  .getAllOneToOneMessage(widget.user.uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.active) {
+                  return ListView.builder(
+                    itemCount: 15,
+                    itemBuilder: (_, index) {
+                      final random = Random().nextInt(14);
+                      return Container(
+                        alignment: random.isEven
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        margin: EdgeInsets.only(
+                          top: 5,
+                          bottom: 5,
+                          left: random.isEven ? 150 : 15,
+                          right: random.isEven ? 15 : 150,
                         ),
-                        child: Shimmer.fromColors(
-                          baseColor: random.isEven
-                              ? context.theme.greyColor!.withOpacity(.3)
-                              : context.theme.greyColor!.withOpacity(.2),
-                          highlightColor: random.isEven
-                              ? context.theme.greyColor!.withOpacity(.4)
-                              : context.theme.greyColor!.withOpacity(.3),
-                          child: Container(
-                            height: 40,
-                            width: 170 +
-                                double.parse(
-                                  (random * 2).toString(),
-                                ),
-                            color: Colors.red,
+                        child: ClipPath(
+                          clipper: UpperNipMessageClipperTwo(
+                            random.isEven
+                                ? MessageType.send
+                                : MessageType.receive,
+                            nipWidth: 8,
+                            nipHeight: 10,
+                            bubbleRadius: 12,
+                          ),
+                          child: Shimmer.fromColors(
+                            baseColor: random.isEven
+                                ? context.theme.greyColor!.withOpacity(.3)
+                                : context.theme.greyColor!.withOpacity(.2),
+                            highlightColor: random.isEven
+                                ? context.theme.greyColor!.withOpacity(.4)
+                                : context.theme.greyColor!.withOpacity(.3),
+                            child: Container(
+                              height: 40,
+                              width: 170 +
+                                  double.parse(
+                                    (random * 2).toString(),
+                                  ),
+                              color: Colors.red,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  );
+                }
+        
+                return PageStorage(
+                  bucket: pageStorageBucket,
+                  child: ListView.builder(
+                    key: const PageStorageKey('chat_page_list'),
+                    itemCount: snapshot.data!.length,
+                    shrinkWrap: true,
+                    controller: _scrollController,
+                    itemBuilder: (_, index) {
+                      final message = snapshot.data![index];
+                      final isSender = message.senderId ==
+                          FirebaseAuth.instance.currentUser!.uid;
+        
+                      final haveNip = (index == 0) ||
+                          (index == snapshot.data!.length - 1 &&
+                              message.senderId !=
+                                  snapshot.data![index - 1].senderId) ||
+                          (message.senderId !=
+                                  snapshot.data![index - 1].senderId &&
+                              message.senderId ==
+                                  snapshot.data![index + 1].senderId) ||
+                          (message.senderId !=
+                                  snapshot.data![index - 1].senderId &&
+                              message.senderId !=
+                                  snapshot.data![index + 1].senderId);
+                      final isShowDateCard = (index == 0) ||
+                          ((index == snapshot.data!.length - 1) &&
+                              (message.timeSent.day >
+                                  snapshot.data![index - 1].timeSent.day)) ||
+                          (message.timeSent.day >
+                                  snapshot.data![index - 1].timeSent.day &&
+                              message.timeSent.day <=
+                                  snapshot.data![index + 1].timeSent.day);
+        
+                      return Column(children: [
+                        if (index == 0) const YellowCard(),
+                        if (isShowDateCard) ShowDateCard(date: message.timeSent),
+                        MessageCard(
+                          isSender: isSender,
+                          haveNip: haveNip,
+                          message: message,
+                        ),
+                      ]);
+                    },
+                  ),
                 );
-              }
-
-              return PageStorage(
-                bucket: pageStorageBucket,
-                child: ListView.builder(
-                  key: const PageStorageKey('chat_page_list'),
-                  itemCount: snapshot.data!.length,
-                  shrinkWrap: true,
-                  controller: _scrollController,
-                  itemBuilder: (_, index) {
-                    final message = snapshot.data![index];
-                    final isSender = message.senderId ==
-                        FirebaseAuth.instance.currentUser!.uid;
-
-                    final haveNip = (index == 0) ||
-                        (index == snapshot.data!.length - 1 &&
-                            message.senderId !=
-                                snapshot.data![index - 1].senderId) ||
-                        (message.senderId !=
-                                snapshot.data![index - 1].senderId &&
-                            message.senderId ==
-                                snapshot.data![index + 1].senderId) ||
-                        (message.senderId !=
-                                snapshot.data![index - 1].senderId &&
-                            message.senderId !=
-                                snapshot.data![index + 1].senderId);
-                    final isShowDateCard = (index == 0) ||
-                        ((index == snapshot.data!.length - 1) &&
-                            (message.timeSent.day >
-                                snapshot.data![index - 1].timeSent.day)) ||
-                        (message.timeSent.day >
-                                snapshot.data![index - 1].timeSent.day &&
-                            message.timeSent.day <=
-                                snapshot.data![index + 1].timeSent.day);
-
-                    return Column(children: [
-                      if (index == 0) const YellowCard(),
-                      if (isShowDateCard) ShowDateCard(date: message.timeSent),
-                      MessageCard(
-                        isSender: isSender,
-                        haveNip: haveNip,
-                        message: message,
-                      ),
-                    ]);
-                  },
-                ),
-              );
-            },
+              },
+            ),
           ),
-        ),
-        Container(
-          alignment: const Alignment(0, 1),
-          child: ChatTextField(
-            receiverId: widget.user.uid,
-            scrollController: _scrollController,
+          Container(
+            alignment: const Alignment(0, 1),
+            child: ChatTextField(
+              receiverId: widget.user.uid,
+              scrollController: _scrollController,
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }
@@ -473,5 +476,18 @@ class _ChatAppBarState extends State<ChatAppBar> {
         ),
       ],
     );
+  }
+}
+
+class NoStretchScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildScrollbar(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // Removes the stretching effect
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics(); // Removes the iOS-style bouncing effect
   }
 }
