@@ -11,16 +11,22 @@ class ShowDateCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
+        horizontal: 8,
+        vertical: 2,
       ),
       margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: context.theme.receiverChatCardBg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        DateFormat.yMMMd().format(date),
+        DateFormat.yMMMMd().format(date),
+        style: TextStyle(
+          fontSize: 13,
+          fontFamily: 'Arial',
+          color: context.theme.greyColor,
+          letterSpacing: 0,
+        ),
       ),
     );
   }

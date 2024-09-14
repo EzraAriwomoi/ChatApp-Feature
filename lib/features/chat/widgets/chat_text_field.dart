@@ -22,22 +22,75 @@ class ChatTextField extends ConsumerStatefulWidget {
   ConsumerState<ChatTextField> createState() => _ChatTextFieldState();
 }
 
-class _ChatTextFieldState extends ConsumerState<ChatTextField> {
+class _ChatTextFieldState extends ConsumerState<ChatTextField>
+    with SingleTickerProviderStateMixin {
   late TextEditingController messageController;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  late Animation<double> _iconPositionAnimation;
+  late Animation<double> _cameraIconAnimation;
 
   bool isMessageIconEnabled = false;
   double cardHeight = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    messageController = TextEditingController()
+      ..addListener(() {
+        if (messageController.text.isNotEmpty && cardHeight > 0) {
+          _toggleCard();
+        }
+        _updateIconAnimations(messageController.text.isNotEmpty);
+      });
+
+    // Initialize Animation Controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    // Define Animation for expansion
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+
+    // Define Animation for icon position
+    _iconPositionAnimation = Tween<double>(begin: 0, end: 50).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Define Animation for hiding camera icon
+    _cameraIconAnimation = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void sendImageMessageFromGallery() async {
     final image = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ImagePickerPage(),
-        ));
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ImagePickerPage(),
+      ),
+    );
 
     if (image != null) {
       sendFileMessage(image, MessageType.image);
-      setState(() => cardHeight = 0);
+      _toggleCard();
     }
   }
 
@@ -78,175 +131,255 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField> {
     });
   }
 
+  void _updateIconAnimations(bool isTyping) {
+    if (isTyping) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+  }
+
   iconWithText({
     required VoidCallback onPressed,
     required IconData icon,
     required String text,
     required Color background,
   }) {
-    return Column(children: [
-      CustomIconButton(
-        onPressed: onPressed,
-        icon: icon,
-        background: background,
-        minWidth: 50,
-        iconColor: Colors.white,
-        border: Border.all(
-          color: context.theme.greyColor!.withOpacity(.2),
-          width: 1,
+    return Column(
+      children: [
+        CustomIconButton(
+          onPressed: onPressed,
+          icon: icon,
+          background: background,
+          minWidth: 50,
+          iconColor: Colors.white,
+          border: Border.all(
+            color: context.theme.greyColor!.withOpacity(.2),
+            width: 1,
+          ),
         ),
-      ),
-      const SizedBox(height: 5),
-      Text(
-        text,
-        style: TextStyle(
-          color: context.theme.greyColor,
+        const SizedBox(height: 5),
+        Text(
+          text,
+          style: TextStyle(
+            color: context.theme.greyColor,
+            fontFamily: 'Arial',
+            fontSize: 14,
+            letterSpacing: 0,
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
-  @override
-  void initState() {
-    messageController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    messageController.dispose();
-    super.dispose();
+  void _toggleCard() {
+    setState(() {
+      if (cardHeight == 0) {
+        cardHeight = 305;
+        _animationController.forward();
+      } else {
+        cardHeight = 0;
+        _animationController.reverse();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: cardHeight,
-        width: double.maxFinite,
-        margin: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: context.theme.receiverChatCardBg,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  iconWithText(
-                    onPressed: () {},
-                    icon: Icons.book,
-                    text: 'File',
-                    background: const Color(0xFF7F66FE),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (cardHeight > 0) {
+              _toggleCard();
+            }
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              SizeTransition(
+                sizeFactor: _animation,
+                axis: Axis.vertical,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: cardHeight,
+                  width: double.maxFinite,
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                  decoration: BoxDecoration(
+                    color: context.theme.barcolor,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  iconWithText(
-                    onPressed: () {},
-                    icon: Icons.camera_alt,
-                    text: 'Camera',
-                    background: const Color(0xFFFE2E74),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.description_outlined,
+                                text: 'Document',
+                                background: const Color(0xFF7F66FE),
+                              ),
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.camera_alt,
+                                text: 'Camera',
+                                background: const Color(0xFFFE2E74),
+                              ),
+                              iconWithText(
+                                onPressed: sendImageMessageFromGallery,
+                                icon: Icons.photo_outlined,
+                                text: 'Gallery',
+                                background: const Color(0xFFC861F9),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.headphones,
+                                text: 'Audio',
+                                background: const Color(0xFFF96533),
+                              ),
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.location_on,
+                                text: 'Location',
+                                background: const Color(0xFF1FA855),
+                              ),
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.person,
+                                text: 'Contact',
+                                background: const Color(0xFF009DE1),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const SizedBox(width: 50),
+                              iconWithText(
+                                onPressed: () {},
+                                icon: Icons.graphic_eq_outlined,
+                                text: 'Poll',
+                                background:
+                                    const Color.fromARGB(255, 37, 158, 138),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  iconWithText(
-                    onPressed: sendImageMessageFromGallery,
-                    icon: Icons.photo,
-                    text: 'Gallery',
-                    background: const Color(0xFFC861F9),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 20),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                iconWithText(
-                  onPressed: () {},
-                  icon: Icons.headphones,
-                  text: 'Audio',
-                  background: const Color(0xFFF96533),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: messageController,
+                        maxLines: 4,
+                        minLines: 1,
+                        onChanged: (value) {
+                          setState(() {
+                            isMessageIconEnabled = value.isNotEmpty;
+                            _updateIconAnimations(value.isNotEmpty);
+                          });
+                        },
+                        cursorColor: Coloors.greenDark,
+                        cursorHeight: 18,
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                          hintStyle: TextStyle(
+                            color: context.theme.greyColor,
+                            fontFamily: 'Arial',
+                            fontSize: 18,
+                          ),
+                          filled: true,
+                          fillColor: context.theme.chatTextFieldBg,
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              style: BorderStyle.none,
+                              width: 0,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          prefixIcon: Material(
+                            color: Colors.transparent,
+                            child: CustomIconButton(
+                              onPressed: () {},
+                              icon: Icons.emoji_emotions_outlined,
+                              iconColor:
+                                  Theme.of(context).listTileTheme.iconColor,
+                            ),
+                          ),
+                          suffixIcon:
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                            AnimatedBuilder(
+                              animation: _iconPositionAnimation,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset:
+                                      Offset(_iconPositionAnimation.value, 0),
+                                  child: CustomIconButton(
+                                    onPressed: _toggleCard,
+                                    icon: Icons.attach_file,
+                                    iconColor: Theme.of(context)
+                                        .listTileTheme
+                                        .iconColor,
+                                  ),
+                                );
+                              },
+                            ),
+                            AnimatedBuilder(
+                              animation: _cameraIconAnimation,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _cameraIconAnimation.value,
+                                  child: Transform.translate(
+                                    offset: Offset(
+                                        -_iconPositionAnimation.value, 0),
+                                    child: CustomIconButton(
+                                      onPressed: () {},
+                                      icon: Icons.camera_alt_outlined,
+                                      iconColor: Theme.of(context)
+                                          .listTileTheme
+                                          .iconColor,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ]),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    CustomIconButton(
+                      onPressed: sendTextMessage,
+                      icon: isMessageIconEnabled
+                          ? Icons.send_rounded
+                          : Icons.mic_rounded,
+                      background: Coloors.greenDark,
+                      iconColor: Colors.black,
+                    ),
+                  ],
                 ),
-                iconWithText(
-                  onPressed: () {},
-                  icon: Icons.location_on,
-                  text: 'Location',
-                  background: const Color(0xFF1FA855),
-                ),
-                iconWithText(
-                  onPressed: () {},
-                  icon: Icons.person,
-                  text: 'Contact',
-                  background: const Color(0xFF009DE1),
-                ),
-              ]),
+              ),
             ]),
           ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Row(children: [
-          Expanded(
-            child: TextFormField(
-              controller: messageController,
-              maxLines: 4,
-              minLines: 1,
-              onChanged: (value) {
-                value.isEmpty
-                    ? setState(() => isMessageIconEnabled = false)
-                    : setState(() => isMessageIconEnabled = true);
-              },
-              decoration: InputDecoration(
-                hintText: 'Message',
-                hintStyle: TextStyle(color: context.theme.greyColor),
-                filled: true,
-                fillColor: context.theme.chatTextFieldBg,
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                    style: BorderStyle.none,
-                    width: 0,
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                prefixIcon: Material(
-                  color: Colors.transparent,
-                  child: CustomIconButton(
-                    onPressed: () {},
-                    icon: Icons.emoji_emotions_outlined,
-                    iconColor: Theme.of(context).listTileTheme.iconColor,
-                  ),
-                ),
-                suffixIcon: Row(mainAxisSize: MainAxisSize.min, children: [
-                  RotatedBox(
-                    quarterTurns: 45,
-                    child: CustomIconButton(
-                      onPressed: () => setState(
-                        () =>
-                            cardHeight == 0 ? cardHeight = 220 : cardHeight = 0,
-                      ),
-                      icon: cardHeight == 0 ? Icons.attach_file : Icons.close,
-                      iconColor: Theme.of(context).listTileTheme.iconColor,
-                    ),
-                  ),
-                  CustomIconButton(
-                    onPressed: () {},
-                    icon: Icons.camera_alt_outlined,
-                    iconColor: Theme.of(context).listTileTheme.iconColor,
-                  ),
-                ]),
-              ),
-            ),
-          ),
-          const SizedBox(width: 5),
-          CustomIconButton(
-            onPressed: sendTextMessage,
-            icon: isMessageIconEnabled
-                ? Icons.send_outlined
-                : Icons.mic_none_outlined,
-            background: Coloors.greenDark,
-            iconColor: Colors.white,
-          ),
-        ]),
-      ),
-    ]);
+      ],
+    );
   }
 }
