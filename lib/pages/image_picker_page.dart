@@ -4,6 +4,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import '../common/models/user_model.dart';
 import '../common/widgets/custom_icon_button.dart';
+import 'widgets/preview.dart';
 
 class ImagePickerSheet extends StatefulWidget {
   const ImagePickerSheet({super.key, required this.user});
@@ -57,7 +58,19 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
-                    onTap: () => Navigator.pop(context, snapshot.data),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PreviewPage(
+                            media: snapshot.data as Uint8List,
+                            username:
+                                widget.user.username, // Pass the username here
+                            isVideo: asset.type == AssetType.video,
+                          ),
+                        ),
+                      );
+                    },
                     borderRadius: BorderRadius.circular(5),
                     splashFactory: NoSplash.splashFactory,
                     child: Stack(
@@ -95,10 +108,9 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                               child: Text(
                                 _formatDuration(asset.videoDuration),
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontFamily: 'Arial'
-                                ),
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Arial'),
                               ),
                             ),
                           ),
@@ -159,7 +171,7 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                   ),
                 ),
                 title: Padding(
-                  padding: const EdgeInsets.only(top: 45.0),
+                  padding: const EdgeInsets.only(top: 35.0),
                   child: Text(
                     'Send to ${widget.user.username}',
                     style: TextStyle(
