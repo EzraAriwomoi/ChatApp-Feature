@@ -1,12 +1,14 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
+import '../common/models/user_model.dart';
 import '../common/widgets/custom_icon_button.dart';
 
 class ImagePickerSheet extends StatefulWidget {
-  const ImagePickerSheet({super.key});
+  const ImagePickerSheet({super.key, required this.user});
+
+  final UserModel user;
 
   @override
   State<ImagePickerSheet> createState() => _ImagePickerSheetState();
@@ -58,17 +60,49 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                     onTap: () => Navigator.pop(context, snapshot.data),
                     borderRadius: BorderRadius.circular(5),
                     splashFactory: NoSplash.splashFactory,
-                    child: Container(
-                      margin: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: context.theme.barcolor!.withOpacity(0.0),
+                    child: Stack(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: context.theme.barcolor!.withOpacity(0.0),
+                            ),
+                            image: DecorationImage(
+                              image: MemoryImage(snapshot.data as Uint8List),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                        image: DecorationImage(
-                          image: MemoryImage(snapshot.data as Uint8List),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                        if (asset.type == AssetType.video)
+                          const Positioned(
+                              bottom: 4,
+                              left: 4,
+                              child: Icon(
+                                Icons.videocam_outlined,
+                                color: Colors.white,
+                              )),
+                        if (asset.type == AssetType.video)
+                          Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                _formatDuration(asset.videoDuration),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontFamily: 'Arial'
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 );
@@ -84,6 +118,14 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
       mediaList.addAll(temp);
       currentPage++;
     });
+  }
+
+  // Function to format the video duration as mm:ss
+  String _formatDuration(Duration duration) {
+    final int seconds = duration.inSeconds;
+    final int minutes = seconds ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   void handleScrollEvent(ScrollNotification scroll) {
@@ -119,7 +161,7 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                 title: Padding(
                   padding: const EdgeInsets.only(top: 45.0),
                   child: Text(
-                    'Send to',
+                    'Send to ${widget.user.username}',
                     style: TextStyle(
                       color: context.theme.authAppbarTextColor,
                       fontFamily: 'Arial',

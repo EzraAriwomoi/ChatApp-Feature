@@ -13,12 +13,14 @@ import 'package:ult_whatsapp/features/auth/auth_controller.dart';
 import 'package:ult_whatsapp/pages/image_picker_page.dart';
 import 'package:ult_whatsapp/pages/widgets/custom_text_field.dart';
 import '../common/helper/show_alert_dialog.dart';
+import '../common/models/user_model.dart';
 import '../common/widgets/custom_elevated_buttom.dart';
 import '../common/widgets/custom_icon_button.dart';
 import '../common/widgets/short_h_bar.dart';
 
 class UserInfoPage extends ConsumerStatefulWidget {
-  const UserInfoPage({super.key, this.profileImageUrl});
+  const UserInfoPage({super.key, this.profileImageUrl,required this.user,});
+  final UserModel user;
 
   final String? profileImageUrl;
 
@@ -96,7 +98,7 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
                 final image = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ImagePickerSheet(),
+                    builder: (context) => ImagePickerSheet(user: widget.user),
                   ),
                 );
                 if (image == null) return;
