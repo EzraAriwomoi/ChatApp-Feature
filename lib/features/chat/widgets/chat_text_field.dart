@@ -10,15 +10,19 @@ import 'package:ult_whatsapp/common/widgets/custom_icon_button.dart';
 import 'package:ult_whatsapp/features/chat/controller/chat_controller.dart';
 import 'package:ult_whatsapp/pages/image_picker_page.dart';
 
+import '../../../common/models/user_model.dart';
+
 class ChatTextField extends ConsumerStatefulWidget {
   const ChatTextField({
     super.key,
     required this.receiverId,
     required this.scrollController,
+    required this.user,
   });
 
   final String receiverId;
   final ScrollController scrollController;
+  final UserModel user;
 
   @override
   ConsumerState<ChatTextField> createState() => _ChatTextFieldState();
@@ -86,7 +90,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
   final image = await showModalBottomSheet<Uint8List>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => const ImagePickerSheet(),
+    builder: (context) => ImagePickerSheet(user: widget.user),
   );
 
   if (image != null) {

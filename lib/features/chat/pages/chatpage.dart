@@ -170,7 +170,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             alignment: const Alignment(0, 1),
             child: ChatTextField(
               receiverId: widget.user.uid,
-              scrollController: _scrollController,
+              scrollController: _scrollController, user: widget.user,
             ),
           ),
         ]),

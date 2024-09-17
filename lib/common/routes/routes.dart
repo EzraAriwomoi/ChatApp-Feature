@@ -22,6 +22,8 @@ class Routes {
   static const String chat = 'chat';
   static const String profile = 'profile';
   static const String settingsPG = 'settings';
+  
+  static get user => null;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -45,7 +47,7 @@ class Routes {
         final String? profileImageUrl = settings.arguments as String?;
         return MaterialPageRoute(
           builder: (context) => UserInfoPage(
-            profileImageUrl: profileImageUrl,
+            profileImageUrl: profileImageUrl, user: user,
           ),
         );
       case home:
