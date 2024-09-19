@@ -98,7 +98,7 @@ void showEndToEndBottomSheet(BuildContext context) {
                       Row(
                         children: [
                           Icon(
-                            Icons.call_outlined,
+                            Icons.call_end_outlined,
                             size: 16,
                             color: context.theme.greyColor,
                           ),

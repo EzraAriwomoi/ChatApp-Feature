@@ -41,28 +41,109 @@ class PreviewPage extends StatelessWidget {
                   ),
           ),
           Positioned(
-            top: 40,
-            left: 16,
+            top: 55,
+            left: 12,
             child: CircleAvatar(
-              backgroundColor: Colors.black54,
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
               child: IconButton(
                 icon: const Icon(
                   Icons.close,
                   color: Colors.white,
+                  size: 22,
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
           ),
+          //HD
           Positioned(
-            top: 40,
-            right: 16,
+            top: 54,
+            right: 205,
             child: CircleAvatar(
-              backgroundColor: Colors.black54,
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
               child: IconButton(
                 icon: const Icon(
-                  Icons.edit,
+                  Icons.hd_outlined,
                   color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {
+                  //hd logic
+                },
+              ),
+            ),
+          ),
+          //rotate image
+          Positioned(
+            top: 54,
+            right: 157,
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.crop_rotate_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {
+                  //rotate logic
+                },
+              ),
+            ),
+          ),
+          //stickers
+          Positioned(
+            top: 54,
+            right: 109,
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.sticky_note_2_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {
+                  //sticker logic
+                },
+              ),
+            ),
+          ),
+          //text
+          Positioned(
+            top: 54,
+            right: 61,
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.text_fields_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {
+                  //text logic
+                },
+              ),
+            ),
+          ),
+          //edit
+          Positioned(
+            top: 54,
+            right: 12,
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: const Color.fromARGB(135, 24, 30, 39),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: Colors.white,
+                  size: 24,
                 ),
                 onPressed: () {
                   //editing logic
@@ -129,8 +210,8 @@ class PreviewPage extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-              color: Coloors.backgroundDark,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: const Color.fromARGB(255, 9, 15, 19),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   Expanded(
@@ -139,16 +220,16 @@ class PreviewPage extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                              horizontal: 16, vertical: 5),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 21, 32, 39),
+                            color: const Color.fromARGB(255, 16, 26, 32),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
                             username,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 17,
                               fontFamily: 'Arial',
                               letterSpacing: 0,
                             ),
@@ -159,9 +240,14 @@ class PreviewPage extends StatelessWidget {
                     ),
                   ),
                   CircleAvatar(
+                    radius: 24,
                     backgroundColor: Coloors.greenDark,
                     child: IconButton(
-                      icon: const Icon(Icons.send_rounded, color: Colors.black),
+                      icon: const Icon(
+                        Icons.send_rounded,
+                        color: Colors.black,
+                        size: 22,
+                      ),
                       onPressed: () {
                         // send logic
                       },
