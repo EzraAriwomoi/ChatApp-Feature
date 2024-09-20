@@ -64,8 +64,7 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                         MaterialPageRoute(
                           builder: (_) => PreviewPage(
                             media: snapshot.data as Uint8List,
-                            username:
-                                widget.user.username, // Pass the username here
+                            username: widget.user.username,
                             isVideo: asset.type == AssetType.video,
                           ),
                         ),
