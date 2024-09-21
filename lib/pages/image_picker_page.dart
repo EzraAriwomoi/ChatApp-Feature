@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -58,17 +59,36 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PreviewPage(
-                            media: snapshot.data as Uint8List,
-                            username: widget.user.username,
-                            isVideo: asset.type == AssetType.video,
+                    onTap: () async {
+                      if (asset.type == AssetType.video) {
+                        final File? file = await asset.file;
+                        if (file != null) {
+                          Navigator.push(
+                            // ignore: use_build_context_synchronously
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PreviewPage(
+                                media: file
+                                    .path,
+                                username: widget.user.username,
+                                isVideo: true,
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PreviewPage(
+                              media: snapshot.data
+                                  as Uint8List,
+                              username: widget.user.username,
+                              isVideo: false,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     },
                     borderRadius: BorderRadius.circular(5),
                     splashFactory: NoSplash.splashFactory,
