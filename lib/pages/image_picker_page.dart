@@ -66,26 +66,57 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                           Navigator.push(
                             // ignore: use_build_context_synchronously
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => PreviewPage(
-                                media: file
-                                    .path,
+                            PageRouteBuilder(
+                              transitionDuration:
+                                  const Duration(milliseconds: 900),
+                              pageBuilder: (_, __, ___) => PreviewPage(
+                                media: file.path,
                                 username: widget.user.username,
                                 isVideo: true,
                               ),
+                              transitionsBuilder: (_, animation, __, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
                             ),
                           );
                         }
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => PreviewPage(
-                              media: snapshot.data
-                                  as Uint8List,
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 900),
+                            pageBuilder: (_, __, ___) => PreviewPage(
+                              media: snapshot.data as Uint8List,
                               username: widget.user.username,
                               isVideo: false,
                             ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              const begin =
+                                  Offset(1.0, 0.0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                           ),
                         );
                       }
