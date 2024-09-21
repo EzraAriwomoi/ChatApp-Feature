@@ -1,13 +1,11 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
 import 'package:ult_whatsapp/common/widgets/custom_icon_button.dart';
 
 class PreviewPage extends StatefulWidget {
-  final Uint8List media;
+  final dynamic media;
   final bool isVideo;
   final String username;
 
@@ -15,45 +13,42 @@ class PreviewPage extends StatefulWidget {
     super.key,
     required this.media,
     required this.username,
-    this.isVideo = false,
+    required this.isVideo,
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _PreviewPageState createState() => _PreviewPageState();
 }
 
 class _PreviewPageState extends State<PreviewPage> {
   VideoPlayerController? _controller;
-  late String _videoPath;
 
   @override
   void initState() {
     super.initState();
     if (widget.isVideo) {
-      _writeVideoToFile().then((filePath) {
-        setState(() {
-          _videoPath = filePath;
-          _controller = VideoPlayerController.file(File(filePath))
-            ..initialize().then((_) {
-              setState(() {});
-              _controller!.play(); // Auto-play video
-            });
+      _controller = VideoPlayerController.file(File(widget.media))
+        ..initialize().then((_) {
+          setState(() {});
+          _controller!.play();
         });
-      });
     }
-  }
-
-  Future<String> _writeVideoToFile() async {
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/video.mp4');
-    await file.writeAsBytes(widget.media);
-    return file.path;
   }
 
   @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
+  }
+
+  Widget _buildVideoPlayer() {
+    return _controller != null && _controller!.value.isInitialized
+        ? AspectRatio(
+            aspectRatio: _controller!.value.aspectRatio,
+            child: VideoPlayer(_controller!),
+          )
+        : const Center(child: CircularProgressIndicator());
   }
 
   @override
@@ -68,16 +63,7 @@ class _PreviewPageState extends State<PreviewPage> {
             children: [
               Center(
                 child: widget.isVideo
-                    ? _controller != null && _controller!.value.isInitialized
-                        ? AspectRatio(
-                            aspectRatio: _controller!.value.aspectRatio,
-                            child: VideoPlayer(_controller!),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
+                    ? _buildVideoPlayer()
                     : Image.memory(
                         widget.media,
                         width: double.infinity,
