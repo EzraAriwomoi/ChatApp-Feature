@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ult_whatsapp/common/utils/coloors.dart';
 import 'package:ult_whatsapp/common/widgets/custom_icon_button.dart';
 
-class PreviewPage extends StatelessWidget {
+class PreviewPage extends StatefulWidget {
   final Uint8List media;
   final bool isVideo;
   final String username;
@@ -16,6 +19,44 @@ class PreviewPage extends StatelessWidget {
   });
 
   @override
+  _PreviewPageState createState() => _PreviewPageState();
+}
+
+class _PreviewPageState extends State<PreviewPage> {
+  VideoPlayerController? _controller;
+  late String _videoPath;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isVideo) {
+      _writeVideoToFile().then((filePath) {
+        setState(() {
+          _videoPath = filePath;
+          _controller = VideoPlayerController.file(File(filePath))
+            ..initialize().then((_) {
+              setState(() {});
+              _controller!.play(); // Auto-play video
+            });
+        });
+      });
+    }
+  }
+
+  Future<String> _writeVideoToFile() async {
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/video.mp4');
+    await file.writeAsBytes(widget.media);
+    return file.path;
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -26,19 +67,19 @@ class PreviewPage extends StatelessWidget {
           return Stack(
             children: [
               Center(
-                child: isVideo
-                    ? Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: Colors.black,
-                        child: const Icon(
-                          Icons.play_circle_outline,
-                          color: Colors.white,
-                          size: 64,
-                        ),
-                      )
+                child: widget.isVideo
+                    ? _controller != null && _controller!.value.isInitialized
+                        ? AspectRatio(
+                            aspectRatio: _controller!.value.aspectRatio,
+                            child: VideoPlayer(_controller!),
+                          )
+                        : const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
                     : Image.memory(
-                        media,
+                        widget.media,
                         width: double.infinity,
                         height: double.infinity,
                         fit: BoxFit.contain,
@@ -233,7 +274,7 @@ class PreviewPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Text(
-                                username,
+                                widget.username,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,

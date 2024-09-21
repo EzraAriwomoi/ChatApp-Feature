@@ -60,6 +60,7 @@ dependencies:
   equatable: ^2.0.5
   font_awesome_flutter: ^10.7.0
   path_provider: ^2.1.4
+  video_player: ^2.9.1
 
 flutter_native_splash:
   color: "#FFFFFF"
