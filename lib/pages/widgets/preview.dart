@@ -21,8 +21,13 @@ class PreviewPage extends StatefulWidget {
   _PreviewPageState createState() => _PreviewPageState();
 }
 
-class _PreviewPageState extends State<PreviewPage> {
+class _PreviewPageState extends State<PreviewPage>
+    with SingleTickerProviderStateMixin {
   VideoPlayerController? _controller;
+  bool _isPlaying = false;
+  bool _showPlayButton = true;
+  late AnimationController _buttonController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -30,25 +35,100 @@ class _PreviewPageState extends State<PreviewPage> {
     if (widget.isVideo) {
       _controller = VideoPlayerController.file(File(widget.media))
         ..initialize().then((_) {
-          setState(() {});
-          _controller!.play();
+          setState(() {
+            _showPlayButton = true;
+          });
+          _controller!.seekTo(Duration.zero);
         });
+
+      _controller!.addListener(() {
+        if (_controller!.value.position >= _controller!.value.duration) {
+          if (_isPlaying) {
+            setState(() {
+              _isPlaying = false;
+              _showPlayButton = true;
+              _buttonController.forward();
+              _controller!.pause();
+              _controller!.seekTo(Duration.zero);
+            });
+          }
+        }
+      });
     }
+
+    _buttonController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fadeAnimation =
+        CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut);
   }
 
   @override
   void dispose() {
     _controller?.dispose();
+    _buttonController.dispose();
     super.dispose();
   }
 
+  void _togglePlayPause() {
+    if (_controller!.value.position >= _controller!.value.duration) {
+      _controller!.seekTo(Duration.zero);
+    }
+    setState(() {
+      if (_isPlaying) {
+        _controller?.pause();
+        _showPlayButton = true;
+        _buttonController.forward();
+      } else {
+        _controller?.play();
+        _showPlayButton = false;
+        _buttonController.reverse();
+      }
+      _isPlaying = !_isPlaying;
+    });
+  }
+
   Widget _buildVideoPlayer() {
-    return _controller != null && _controller!.value.isInitialized
-        ? AspectRatio(
+    if (_controller == null || !_controller!.value.isInitialized) {
+      return const Center(
+          child: CircularProgressIndicator(
+        color: Coloors.greenDark,
+      ));
+    }
+
+    return GestureDetector(
+      onTap: _togglePlayPause,
+      child: Stack(
+        children: [
+          AspectRatio(
             aspectRatio: _controller!.value.aspectRatio,
             child: VideoPlayer(_controller!),
-          )
-        : const Center(child: CircularProgressIndicator());
+          ),
+          if (_showPlayButton)
+            Positioned(
+              bottom: 320,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: CircleAvatar(
+                  radius: 35,
+                  backgroundColor: Colors.black.withOpacity(0.4),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: Color.fromARGB(202, 255, 255, 255),
+                      size: 49,
+                    ),
+                    onPressed: _togglePlayPause,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -90,7 +170,9 @@ class _PreviewPageState extends State<PreviewPage> {
               //HD
               Positioned(
                 top: 54,
-                right: 205,
+                right: widget.isVideo
+                    ? 157
+                    : 205, // Adjust HD position for video mode
                 child: CircleAvatar(
                   radius: 21,
                   backgroundColor: const Color.fromARGB(135, 24, 30, 39),
@@ -101,31 +183,31 @@ class _PreviewPageState extends State<PreviewPage> {
                       size: 24,
                     ),
                     onPressed: () {
-                      //hd logic
+                      // HD logic
                     },
                   ),
                 ),
               ),
-              //rotate image
-              Positioned(
-                top: 54,
-                right: 157,
-                child: CircleAvatar(
-                  radius: 21,
-                  backgroundColor: const Color.fromARGB(135, 24, 30, 39),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.crop_rotate_outlined,
-                      color: Colors.white,
-                      size: 24,
+              if (!widget.isVideo)
+                Positioned(
+                  top: 54,
+                  right: 157,
+                  child: CircleAvatar(
+                    radius: 21,
+                    backgroundColor: const Color.fromARGB(135, 24, 30, 39),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.crop_rotate_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      onPressed: () {
+                        // Rotate logic
+                      },
                     ),
-                    onPressed: () {
-                      //rotate logic
-                    },
                   ),
                 ),
-              ),
-              //stickers
+              // Stickers
               Positioned(
                 top: 54,
                 right: 109,
@@ -139,12 +221,12 @@ class _PreviewPageState extends State<PreviewPage> {
                       size: 24,
                     ),
                     onPressed: () {
-                      //sticker logic
+                      // Sticker logic
                     },
                   ),
                 ),
               ),
-              //text
+              // Text
               Positioned(
                 top: 54,
                 right: 61,
@@ -158,12 +240,12 @@ class _PreviewPageState extends State<PreviewPage> {
                       size: 24,
                     ),
                     onPressed: () {
-                      //text logic
+                      // Text logic
                     },
                   ),
                 ),
               ),
-              //edit
+              // Edit
               Positioned(
                 top: 54,
                 right: 12,
@@ -177,11 +259,12 @@ class _PreviewPageState extends State<PreviewPage> {
                       size: 24,
                     ),
                     onPressed: () {
-                      //editing logic
+                      // Editing logic
                     },
                   ),
                 ),
               ),
+              // Caption input field
               Positioned(
                 bottom: 66 + bottomPadding,
                 left: 0,
@@ -236,6 +319,7 @@ class _PreviewPageState extends State<PreviewPage> {
                   ),
                 ),
               ),
+              // Send button and username
               Positioned(
                 bottom: bottomPadding,
                 left: 0,
@@ -283,7 +367,7 @@ class _PreviewPageState extends State<PreviewPage> {
                             size: 22,
                           ),
                           onPressed: () {
-                            // send logic
+                            // Send logic
                           },
                         ),
                       ),
