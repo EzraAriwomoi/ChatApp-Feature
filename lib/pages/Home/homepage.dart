@@ -28,7 +28,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late TextEditingController _searchController;
   List<CameraDescription>? cameras;
   CameraController? cameraController;
-  int _selectedIndex = 0; // Default to the 'Chats' tab
+  int _selectedIndex = 0;
 
   updateUserPresence() {
     ref.read(authControllerProvider).updateUserPresence();
@@ -43,7 +43,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       (timer) => setState(() {}),
     );
     _searchController = TextEditingController();
-    _initializeCamera();
   }
 
   @override
@@ -63,23 +62,27 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _openCamera() async {
-  // Request camera permission
-  if (await Permission.camera.request().isGranted) {
-    if (cameraController != null && cameraController!.value.isInitialized) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CameraScreen(cameraController: cameraController),
-        ),
-      );
+    // Request camera permission
+    if (await Permission.camera.request().isGranted) {
+      if (cameraController == null || !cameraController!.value.isInitialized) {
+        await _initializeCamera();
+      }
+
+      if (cameraController!.value.isInitialized) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CameraScreen(cameraController: cameraController),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Camera is not initialized')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera is not initialized')),
-      );
-    }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Camera permission denied')),
+        const SnackBar(content: Text('Camera permission denied')),
     );
   }
 }
