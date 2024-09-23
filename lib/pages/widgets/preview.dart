@@ -235,7 +235,7 @@ class _PreviewPageState extends State<PreviewPage>
                   backgroundColor: const Color.fromARGB(135, 24, 30, 39),
                   child: IconButton(
                     icon: const Icon(
-                      Icons.text_fields_outlined,
+                      Icons.title_rounded,
                       color: Colors.white,
                       size: 24,
                     ),

@@ -68,7 +68,7 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                             context,
                             PageRouteBuilder(
                               transitionDuration:
-                                  const Duration(milliseconds: 900),
+                                  const Duration(milliseconds: 500),
                               pageBuilder: (_, __, ___) => PreviewPage(
                                 media: file.path,
                                 username: widget.user.username,
@@ -96,7 +96,7 @@ class _ImagePickerSheetState extends State<ImagePickerSheet>
                           context,
                           PageRouteBuilder(
                             transitionDuration:
-                                const Duration(milliseconds: 900),
+                                const Duration(milliseconds: 500),
                             pageBuilder: (_, __, ___) => PreviewPage(
                               media: snapshot.data as Uint8List,
                               username: widget.user.username,
