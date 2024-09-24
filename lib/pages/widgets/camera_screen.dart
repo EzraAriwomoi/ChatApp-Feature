@@ -50,13 +50,14 @@ class _CameraScreenState extends State<CameraScreen>
       final imageDirectory = Directory(directory.path);
       final List<File> imageFiles = [];
       final List<FileSystemEntity> files = imageDirectory.listSync();
-      
+
       for (var file in files) {
-        if (file is File && (file.path.endsWith('.jpg') || file.path.endsWith('.png'))) {
+        if (file is File &&
+            (file.path.endsWith('.jpg') || file.path.endsWith('.png'))) {
           imageFiles.add(file);
         }
       }
-      
+
       return imageFiles;
     }
     return [];
@@ -90,7 +91,8 @@ class _CameraScreenState extends State<CameraScreen>
     setState(() {
       _cameras = cameras;
       _currentCamera = _cameras.isNotEmpty ? _cameras.first : null;
-      isFrontCamera = _currentCamera?.lensDirection == CameraLensDirection.front;
+      isFrontCamera =
+          _currentCamera?.lensDirection == CameraLensDirection.front;
       if (_currentCamera != null) {
         widget.cameraController = CameraController(
           _currentCamera!,
@@ -135,134 +137,138 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   void _capturePhoto() async {
-  try {
-    final XFile? photo = await widget.cameraController?.takePicture();
-    if (photo != null) {
-      // Check if flash is on and turn it off
-      bool wasFlashOn = _flashMode == FlashMode.torch;
+    try {
+      final XFile? photo = await widget.cameraController?.takePicture();
+      if (photo != null) {
+        // Check if flash is on and turn it off
+        bool wasFlashOn = _flashMode == FlashMode.torch;
 
-      if (wasFlashOn) {
-        setState(() {
-          _flashMode = FlashMode.off; // Turn off flash mode
-        });
-        await widget.cameraController?.setFlashMode(_flashMode); // Update flash mode
+        if (wasFlashOn) {
+          setState(() {
+            _flashMode = FlashMode.off; // Turn off flash mode
+          });
+          await widget.cameraController
+              ?.setFlashMode(_flashMode); // Update flash mode
+        }
+
+        // Navigate to CameraViewPage to display and edit the photo with transition
+        final bool turnFlashBackOn = await Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 500),
+                pageBuilder: (_, __, ___) => CameraViewPage(
+                  path: photo.path,
+                  turnFlashOn: wasFlashOn, // Pass the correct flash state
+                ),
+                transitionsBuilder: (_, animation, __, child) {
+                  const begin = Offset(1.0, 0.0); // Start from the right
+                  const end = Offset.zero; // End at the original position
+                  const curve = Curves.easeInOut;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+              ),
+            ) ??
+            false; // Default to false if null
+
+        // Restore flashlight state if necessary
+        if (turnFlashBackOn) {
+          setState(() {
+            _flashMode = FlashMode.torch; // Turn it back on
+          });
+          await widget.cameraController?.setFlashMode(_flashMode);
+        }
       }
-
-      // Navigate to CameraViewPage to display and edit the photo with transition
-      final bool turnFlashBackOn = await Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 500),
-          pageBuilder: (_, __, ___) => CameraViewPage(
-            path: photo.path,
-            turnFlashOn: wasFlashOn, // Pass the correct flash state
-          ),
-          transitionsBuilder: (_, animation, __, child) {
-            const begin = Offset(1.0, 0.0); // Start from the right
-            const end = Offset.zero; // End at the original position
-            const curve = Curves.easeInOut;
-
-            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            var offsetAnimation = animation.drive(tween);
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
-      ) ?? false; // Default to false if null
-
-      // Restore flashlight state if necessary
-      if (turnFlashBackOn) {
-        setState(() {
-          _flashMode = FlashMode.torch; // Turn it back on
-        });
-        await widget.cameraController?.setFlashMode(_flashMode);
-      }
+    } catch (e) {
+      // print('Error capturing photo: $e');
     }
-  } catch (e) {
-    // Handle error
-    print('Error capturing photo: $e');
   }
-}
 
   void _captureOrRecord() async {
-  if (isVideoMode) {
-    if (isRecording) {
-      try {
-        final XFile? videoFile = await widget.cameraController?.stopVideoRecording();
-        if (videoFile != null) {
-          // Check if flash is on and turn it off
-          bool wasFlashOn = _flashMode == FlashMode.torch;
+    if (isVideoMode) {
+      if (isRecording) {
+        try {
+          final XFile? videoFile =
+              await widget.cameraController?.stopVideoRecording();
+          if (videoFile != null) {
+            // Check if flash is on and turn it off
+            bool wasFlashOn = _flashMode == FlashMode.torch;
 
-          if (wasFlashOn) {
-            setState(() {
-              _flashMode = FlashMode.off; // Turn off flash mode
-            });
-            await widget.cameraController?.setFlashMode(_flashMode); // Update flash mode
+            if (wasFlashOn) {
+              setState(() {
+                _flashMode = FlashMode.off;
+              });
+              await widget.cameraController
+                  ?.setFlashMode(_flashMode);
+            }
+
+            // Navigate to VideoViewPage to display and edit the video with transition
+            final bool turnFlashBackOn = await Navigator.push(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (_, __, ___) => VideoViewPage(
+                      path: videoFile.path,
+                      turnFlashOn: wasFlashOn,
+                    ),
+                    transitionsBuilder: (_, animation, __, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOut;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                ) ??
+                false;
+
+            if (turnFlashBackOn) {
+              setState(() {
+                _flashMode = FlashMode.torch;
+              });
+              await widget.cameraController?.setFlashMode(_flashMode);
+            }
           }
-
-          // Navigate to VideoViewPage to display and edit the video with transition
-          final bool turnFlashBackOn = await Navigator.push(
-            context,
-            PageRouteBuilder(
-              transitionDuration: const Duration(milliseconds: 500),
-              pageBuilder: (_, __, ___) => VideoViewPage(
-                path: videoFile.path,
-                turnFlashOn: wasFlashOn, // Pass the correct flash state
-              ),
-              transitionsBuilder: (_, animation, __, child) {
-                const begin = Offset(1.0, 0.0); // Start from the right
-                const end = Offset.zero; // End at the original position
-                const curve = Curves.easeInOut;
-
-                var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                var offsetAnimation = animation.drive(tween);
-
-                return SlideTransition(
-                  position: offsetAnimation,
-                  child: child,
-                );
-              },
-            ),
-          ) ?? false; // Default to false if null
-
-          // Restore flashlight state if necessary
-          if (turnFlashBackOn) {
-            setState(() {
-              _flashMode = FlashMode.torch; // Turn it back on
-            });
-            await widget.cameraController?.setFlashMode(_flashMode);
-          }
+        } catch (e) {
+          // print('Error stopping video recording: $e');
         }
-      } catch (e) {
-        // Handle error
-        print('Error stopping video recording: $e');
-      }
-      setState(() {
-        isRecording = false;
-        _timer?.cancel();
-        _elapsedTime = 0;
-        _innerCircleColor = Colors.white;
-        _progress = 0.0;
-      });
-    } else {
-      try {
-        await widget.cameraController?.startVideoRecording();
         setState(() {
-          isRecording = true;
-          _innerCircleColor = const Color.fromARGB(255, 255, 92, 80);
+          isRecording = false;
           _timer?.cancel();
-          _startTimer();
+          _elapsedTime = 0;
+          _innerCircleColor = Colors.white;
+          _progress = 0.0;
         });
-      } catch (e) {
-        // Handle error
-        print('Error starting video recording: $e');
+      } else {
+        try {
+          await widget.cameraController?.startVideoRecording();
+          setState(() {
+            isRecording = true;
+            _innerCircleColor = const Color.fromARGB(255, 255, 92, 80);
+            _timer?.cancel();
+            _startTimer();
+          });
+        } catch (e) {
+          // print('Error starting video recording: $e');
+        }
       }
     }
   }
-}
 
   void _switchToPhotoMode() {
     setState(() {
@@ -277,69 +283,69 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   Future<void> _switchCamera() async {
-  if (_cameras.length < 2) return;
+    if (_cameras.length < 2) return;
 
-  final newCamera = _cameras.firstWhere(
-    (camera) =>
-        camera.lensDirection != (_currentCamera?.lensDirection ?? CameraLensDirection.back),
-    orElse: () => _cameras.first,
-  );
+    final newCamera = _cameras.firstWhere(
+      (camera) =>
+          camera.lensDirection !=
+          (_currentCamera?.lensDirection ?? CameraLensDirection.back),
+      orElse: () => _cameras.first,
+    );
 
-  setState(() {
-    _currentCamera = newCamera;
-    isFrontCamera = newCamera.lensDirection == CameraLensDirection.front;
-  });
-
-  widget.cameraController =
-      CameraController(_currentCamera!, ResolutionPreset.high);
-  widget.cameraController?.initialize().then((_) {
-    if (mounted) {
-      setState(() {});
-    }
-  }).catchError((error) {
-    print("Error switching camera: $error");
-  });
-}
-
-  Future<void> _switchCameraDuringRecording() async {
-  if (_cameras.length < 2 || !isRecording) return;
-
-  // Find the new camera
-  final CameraDescription newCamera = _cameras.firstWhere(
-    (camera) => camera.lensDirection != _currentCamera?.lensDirection,
-    orElse: () => _cameras.first,
-  );
-
-  try {
-    // Stop recording without saving the video
-    await widget.cameraController?.stopVideoRecording();
-
-    // Update camera state
     setState(() {
       _currentCamera = newCamera;
       isFrontCamera = newCamera.lensDirection == CameraLensDirection.front;
     });
 
-    // Initialize the new camera
-    widget.cameraController = CameraController(
-      _currentCamera!,
-      ResolutionPreset.high,
-      enableAudio: true,
+    widget.cameraController =
+        CameraController(_currentCamera!, ResolutionPreset.high);
+    widget.cameraController?.initialize().then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    }).catchError((error) {
+      // print("Error switching camera: $error");
+    });
+  }
+
+  Future<void> _switchCameraDuringRecording() async {
+    if (_cameras.length < 2 || !isRecording) return;
+
+    final CameraDescription newCamera = _cameras.firstWhere(
+      (camera) => camera.lensDirection != _currentCamera?.lensDirection,
+      orElse: () => _cameras.first,
     );
 
-    await widget.cameraController?.initialize();
+    try {
+      // Stop recording without saving the video
+      await widget.cameraController?.stopVideoRecording();
 
-    if (mounted) {
-      setState(() {});
+      // Update camera state
+      setState(() {
+        _currentCamera = newCamera;
+        isFrontCamera = newCamera.lensDirection == CameraLensDirection.front;
+      });
+
+      // Initialize the new camera
+      widget.cameraController = CameraController(
+        _currentCamera!,
+        ResolutionPreset.high,
+        enableAudio: true,
+      );
+
+      await widget.cameraController?.initialize();
+
+      if (mounted) {
+        setState(() {});
+      }
+
+      // Start recording again
+      await widget.cameraController?.startVideoRecording();
+      // print('Switched camera and resumed recording.');
+    } catch (error) {
+      // print("Error switching camera while recording: $error");
     }
-
-    // Start recording again
-    await widget.cameraController?.startVideoRecording();
-    print('Switched camera and resumed recording.');
-  } catch (error) {
-    print("Error switching camera while recording: $error");
   }
-}
 
   void _handleHorizontalSwipe(DragEndDetails details) {
     if (details.velocity.pixelsPerSecond.dx > 0) {
@@ -430,10 +436,11 @@ class _CameraScreenState extends State<CameraScreen>
                       child: SizedBox(
                         height: 200,
                         child: GridView.builder(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3, // Number of columns
-                            crossAxisSpacing: 8.0, // Spacing between columns
-                            mainAxisSpacing: 8.0, // Spacing between rows
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8.0,
+                            mainAxisSpacing: 8.0,
                           ),
                           itemCount: _galleryImages.length,
                           itemBuilder: (context, index) {
@@ -590,50 +597,49 @@ class _CameraScreenState extends State<CameraScreen>
                   ),
 
                   // Center capture
-Positioned(
-  bottom: 125,
-  left: MediaQuery.of(context).size.width * 0.5 - 35,
-  child: GestureDetector(
-    onTap: () {
-      if (isVideoMode) {
-        _captureOrRecord(); // Handle video recording
-      } else {
-        _capturePhoto(); // Handle photo capture
-      }
-    },
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox(
-          width: 70,
-          height: 70,
-          child: CircularProgressIndicator(
-            value: isRecording ? _progress : 0.0,
-            strokeWidth: 5,
-            valueColor: const AlwaysStoppedAnimation(
-              Color.fromARGB(255, 255, 92, 80),
-            ),
-            backgroundColor: Colors.white,
-          ),
-        ),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: isVideoMode ? 33 : 50,
-          height: isVideoMode ? 33 : 50,
-          decoration: BoxDecoration(
-            color: _innerCircleColor,
-            shape: isRecording
-                ? BoxShape.rectangle
-                : BoxShape.circle,
-            borderRadius:
-                isRecording ? BorderRadius.circular(8) : null,
-          ),
-        ),
-      ],
-    ),
-  ),
-),
-
+                  Positioned(
+                    bottom: 125,
+                    left: MediaQuery.of(context).size.width * 0.5 - 35,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (isVideoMode) {
+                          _captureOrRecord();
+                        } else {
+                          _capturePhoto();
+                        }
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            width: 70,
+                            height: 70,
+                            child: CircularProgressIndicator(
+                              value: isRecording ? _progress : 0.0,
+                              strokeWidth: 5,
+                              valueColor: const AlwaysStoppedAnimation(
+                                Color.fromARGB(255, 255, 92, 80),
+                              ),
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            width: isVideoMode ? 33 : 50,
+                            height: isVideoMode ? 33 : 50,
+                            decoration: BoxDecoration(
+                              color: _innerCircleColor,
+                              shape: isRecording
+                                  ? BoxShape.rectangle
+                                  : BoxShape.circle,
+                              borderRadius:
+                                  isRecording ? BorderRadius.circular(8) : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
                   // Change to selfie
                   Positioned(
@@ -656,16 +662,17 @@ Positioned(
                           );
                         },
                         child: IconButton(
-  icon: const Icon(Icons.loop_rounded, color: Colors.white, size: 28),
-  onPressed: () {
-    // Switch camera during recording
-    if (isRecording) {
-      _switchCameraDuringRecording();
-    } else {
-      _switchCamera();
-    }
-  },
-),
+                          icon: const Icon(Icons.loop_rounded,
+                              color: Colors.white, size: 28),
+                          onPressed: () {
+                            // Switch camera during recording
+                            if (isRecording) {
+                              _switchCameraDuringRecording();
+                            } else {
+                              _switchCamera();
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),

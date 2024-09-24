@@ -72,7 +72,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CameraScreen(cameraController: cameraController),
+            builder: (context) =>
+                CameraScreen(cameraController: cameraController),
           ),
         );
       } else {
@@ -83,9 +84,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Camera permission denied')),
-    );
+      );
+    }
   }
-}
 
   void _onItemTapped(int index) {
     setState(() {
@@ -273,60 +274,84 @@ class _HomePageState extends ConsumerState<HomePage> {
                     const PopupMenuItem<int>(
                       value: 1,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'New group',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 2,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'New broadcast',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 3,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'Linked devices',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 4,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'Starred messages',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 5,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'Settings',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 6,
                       child: SizedBox(
-                        width: 140,
+                        width: 145,
                         child: Text(
                           'Switch accounts',
-                          style: TextStyle(fontSize: 12.0),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Arial',
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
                     ),
