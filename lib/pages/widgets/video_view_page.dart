@@ -37,7 +37,6 @@ class _VideoViewPageState extends State<VideoViewPage> {
         _generateThumbnails();
       });
 
-    // Add listener to update the current position
     _controller.addListener(() {
       setState(() {
         _currentPosition = _controller.value.position.inSeconds.toDouble();
@@ -47,11 +46,10 @@ class _VideoViewPageState extends State<VideoViewPage> {
   }
 
   Future<void> _generateThumbnails() async {
-    await Future.delayed(const Duration(seconds: 1)); // Ensure file is ready
+    await Future.delayed(const Duration(seconds: 1));
 
     final duration = _controller.value.duration.inSeconds;
     List<String> tempThumbnails = [];
-    print('Video duration in seconds: $duration');
 
     for (int i = 0; i < duration; i += 2) {
       try {
@@ -59,27 +57,22 @@ class _VideoViewPageState extends State<VideoViewPage> {
           video: widget.path,
           thumbnailPath: '${(await getTemporaryDirectory()).path}/thumb_$i.jpg',
           imageFormat: ImageFormat.JPEG,
-          maxWidth: 120, // Change as necessary
-          quality: 100, // Change as necessary
+          maxWidth: 120,
+          quality: 100,
           timeMs: i * 1000,
         );
 
         if (thumbnail != null) {
-          print('Thumbnail generated: $thumbnail');
           tempThumbnails.add(thumbnail);
-        } else {
-          print('Failed to generate thumbnail at time: ${i}s');
         }
       } catch (e) {
-        print('Error generating thumbnail at time: ${i}s - $e');
+        // print('Error generating thumbnail at time: ${i}s - $e');
       }
     }
 
     setState(() {
       _thumbnails = tempThumbnails;
     });
-
-    print('Total thumbnails generated: ${tempThumbnails.length}');
   }
 
   @override
@@ -108,6 +101,7 @@ class _VideoViewPageState extends State<VideoViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         return true;
@@ -151,34 +145,29 @@ class _VideoViewPageState extends State<VideoViewPage> {
                     // Thumbnails for the video timeline
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors
-                            .transparent, // Background color for the thumbnails
+                        color: Colors.transparent,
                         border: Border.all(
-                          color: Colors.white, // White border color
-                          width: 2.0, // Thickness of the border
+                          color: Colors.white,
+                          width: 2,
                         ),
                       ),
-                      height: 41, // Adjust height for thumbnails and border
+                      height: 41,
                       child: Stack(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .start, // Aligns items to the start
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: _thumbnails.map((thumbnailPath) {
                               // Calculate the width based on the total number of thumbnails
                               double thumbnailWidth =
                                   (MediaQuery.of(context).size.width - 32) /
-                                      _thumbnails.length; // Subtracting margins
+                                      _thumbnails.length;
                               return Padding(
                                 padding: const EdgeInsets.all(0.0),
-                                child: Container(
-                                  width:
-                                      thumbnailWidth, // Dynamic width for each thumbnail
+                                child: SizedBox(
+                                  width: thumbnailWidth,
                                   child: Image.file(
-                                    File(
-                                        thumbnailPath), // Use generated thumbnails
-                                    fit: BoxFit
-                                        .cover, // Ensure the image covers the container
+                                    File(thumbnailPath),
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               );
@@ -210,7 +199,7 @@ class _VideoViewPageState extends State<VideoViewPage> {
                 child: Container(
                   width: 12,
                   height: 12,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
@@ -224,21 +213,50 @@ class _VideoViewPageState extends State<VideoViewPage> {
                 child: Container(
                   width: 12,
                   height: 12,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
                 ),
               ),
 
+              // Volume display
+              Positioned(
+                top: 164,
+                left: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(135, 24, 30, 39),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.volume_up_outlined,
+                    color: Colors.white,
+                    size: 17,
+                  ),
+                ),
+              ),
+
               // Duration and size display
               Positioned(
-                top: 195,
-                left: 12,
-                child: Text(
-                  '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')} • 624 kB',
-                  style: const TextStyle(
-                    color: Colors.white,
+                top: 163,
+                left: 60,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(135, 24, 30, 39),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}  •  624 kB',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Arial',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
               ),
