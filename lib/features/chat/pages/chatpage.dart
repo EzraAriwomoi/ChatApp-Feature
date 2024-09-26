@@ -117,7 +117,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                     },
                   );
                 }
-        
+
                 return PageStorage(
                   bucket: pageStorageBucket,
                   child: ListView.builder(
@@ -129,7 +129,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                       final message = snapshot.data![index];
                       final isSender = message.senderId ==
                           FirebaseAuth.instance.currentUser!.uid;
-        
+
                       final haveNip = (index == 0) ||
                           (index == snapshot.data!.length - 1 &&
                               message.senderId !=
@@ -150,10 +150,11 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                   snapshot.data![index - 1].timeSent.day &&
                               message.timeSent.day <=
                                   snapshot.data![index + 1].timeSent.day);
-        
+
                       return Column(children: [
                         if (index == 0) const YellowCard(),
-                        if (isShowDateCard) ShowDateCard(date: message.timeSent),
+                        if (isShowDateCard)
+                          ShowDateCard(date: message.timeSent.toLocal()),
                         MessageCard(
                           isSender: isSender,
                           haveNip: haveNip,
@@ -170,7 +171,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             alignment: const Alignment(0, 1),
             child: ChatTextField(
               receiverId: widget.user.uid,
-              scrollController: _scrollController, user: widget.user,
+              scrollController: _scrollController,
+              user: widget.user,
             ),
           ),
         ]),

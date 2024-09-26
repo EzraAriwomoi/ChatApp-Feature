@@ -78,7 +78,12 @@ class MessageCard extends StatelessWidget {
                       ),
                       child: Text(
                         "${message.textMessage}         ",
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontFamily: 'Arial',
+                          letterSpacing: 0,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
             ),
@@ -95,6 +100,8 @@ class MessageCard extends StatelessWidget {
                     DateFormat.Hm().format(message.timeSent),
                     style: TextStyle(
                       fontSize: 11,
+                      fontFamily: 'Arial',
+                      letterSpacing: 0,
                       color: context.theme.greyColor,
                     ),
                   )

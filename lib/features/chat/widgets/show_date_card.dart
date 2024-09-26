@@ -9,6 +9,20 @@ class ShowDateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final currentDate = DateTime(now.year, now.month, now.day);
+    final yesterday = currentDate.subtract(const Duration(days: 1));
+
+    String displayText;
+
+    if (date.year == currentDate.year && date.month == currentDate.month && date.day == currentDate.day) {
+      displayText = 'Today';
+    } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
+      displayText = 'Yesterday';
+    } else {
+      displayText = DateFormat.yMMMMd().format(date);
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 8,
@@ -20,7 +34,7 @@ class ShowDateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        DateFormat.yMMMMd().format(date),
+        displayText,
         style: TextStyle(
           fontSize: 13,
           fontFamily: 'Arial',

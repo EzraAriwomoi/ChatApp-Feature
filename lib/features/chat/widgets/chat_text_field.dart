@@ -50,19 +50,17 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
         _updateIconAnimations(messageController.text.isNotEmpty);
       });
 
-    // Initialize Animation Controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
-    // Define Animation for expansion
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     );
 
-    // Define Animation for icon position
+    // Icon position switch
     _iconPositionAnimation = Tween<double>(begin: 0, end: 50).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -70,7 +68,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
       ),
     );
 
-    // Define Animation for hiding camera icon
+    // Hiding camera icon
     _cameraIconAnimation = Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -87,17 +85,17 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
   }
 
   void sendImageMessageFromGallery() async {
-  final image = await showModalBottomSheet<Uint8List>(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) => ImagePickerSheet(user: widget.user),
-  );
+    final image = await showModalBottomSheet<Uint8List>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ImagePickerSheet(user: widget.user),
+    );
 
-  if (image != null) {
-    sendFileMessage(image, MessageType.image);
-    _toggleCard();
+    if (image != null) {
+      sendFileMessage(image, MessageType.image);
+      _toggleCard();
+    }
   }
-}
 
   void sendFileMessage(var file, MessageType messageType) async {
     ref.read(chatControllerProvider).sendFileMessage(
@@ -302,6 +300,12 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                         },
                         cursorColor: Coloors.greenDark,
                         cursorHeight: 18,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Arial',
+                          fontSize: 18,
+                          letterSpacing: 0,
+                        ),
                         decoration: InputDecoration(
                           hintText: 'Message',
                           hintStyle: TextStyle(
