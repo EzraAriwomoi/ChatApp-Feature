@@ -5,19 +5,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ult_whatsapp/common/routes/routes.dart';
 import 'package:ult_whatsapp/common/theme/dark_theme.dart';
 import 'package:ult_whatsapp/common/theme/light_theme.dart';
+import 'package:ult_whatsapp/common/utils/coloors.dart';
 import 'package:ult_whatsapp/features/auth/auth_controller.dart';
-// import 'package:ult_whatsapp/features/contact/contact_page.dart';
 import 'package:ult_whatsapp/firebase_options.dart';
 import 'package:ult_whatsapp/pages/Home/homepage.dart';
 import 'package:ult_whatsapp/pages/welcome_page.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  //These keeps the splash screen on until it loaded up all the neccessary data
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Remove the splash screen after Firebase initialization
+  FlutterNativeSplash.remove();
+
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -36,22 +41,24 @@ class MyApp extends ConsumerWidget {
       theme: lightTheme(),
       darkTheme: darkTheme(),
       themeMode: ThemeMode.system,
-      // home: const ContactPage(),
       home: ref.watch(userInfoAuthProvider).when(
             data: (user) {
-              //These will make disappear the splash screen when datas are loaded
-              FlutterNativeSplash.remove();
+              // Directly returning the appropriate page based on user authentication state
               if (user == null) return const WelcomePage();
               return const HomePage();
             },
             error: (error, trace) {
               return const Scaffold(
                 body: Center(
-                  child: Text('Something wrong happened'),
+                  child: Text('Something went wrong'),
                 ),
               );
             },
-            loading: () => const SizedBox(),
+            loading: () => const Center(
+              child: CircularProgressIndicator(
+                color: Coloors.greenLight,
+              ),
+            ),
           ),
       onGenerateRoute: Routes.onGenerateRoute,
     );
