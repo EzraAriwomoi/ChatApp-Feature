@@ -21,9 +21,10 @@ class VideoViewPage extends StatefulWidget {
 class _VideoViewPageState extends State<VideoViewPage> {
   late final VideoPlayerController _controller;
   double _currentPosition = 0;
-  late double _totalDuration;
+  late double _totalDuration = 0;
   bool _isHDEnabled = false;
   List<String> _thumbnails = [];
+  int videoFileSizeInBytes = 0;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _VideoViewPageState extends State<VideoViewPage> {
     _controller = VideoPlayerController.file(File(widget.path))
       ..initialize().then((_) {
         setState(() {});
+        _getVideoFileSize();
         if (widget.turnFlashOn) {
           _turnFlashOn();
         }
@@ -46,7 +48,7 @@ class _VideoViewPageState extends State<VideoViewPage> {
   }
 
   Future<void> _generateThumbnails() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final duration = _controller.value.duration.inSeconds;
     List<String> tempThumbnails = [];
@@ -57,8 +59,8 @@ class _VideoViewPageState extends State<VideoViewPage> {
           video: widget.path,
           thumbnailPath: '${(await getTemporaryDirectory()).path}/thumb_$i.jpg',
           imageFormat: ImageFormat.JPEG,
-          maxWidth: 120,
-          quality: 100,
+          maxWidth: 80,
+          quality: 50,
           timeMs: i * 1000,
         );
 
@@ -97,6 +99,24 @@ class _VideoViewPageState extends State<VideoViewPage> {
     setState(() {
       _isHDEnabled = !_isHDEnabled;
     });
+  }
+
+  // Function to get the video file size
+  Future<void> _getVideoFileSize() async {
+    final file = File(widget.path);
+    videoFileSizeInBytes = await file.length();
+    setState(() {});
+  }
+
+  // Function to convert bytes to human-readable size (KB/MB)
+  String getFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(2)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+    }
   }
 
   @override
@@ -222,12 +242,12 @@ class _VideoViewPageState extends State<VideoViewPage> {
 
               // Volume display
               Positioned(
-                top: 164,
+                top: 146,
                 left: 16,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(135, 24, 30, 39),
+                    color: Colors.black45,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(
@@ -240,17 +260,16 @@ class _VideoViewPageState extends State<VideoViewPage> {
 
               // Duration and size display
               Positioned(
-                top: 163,
+                top: 146,
                 left: 60,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(135, 24, 30, 39),
+                    color: Colors.black45,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}  •  624 kB',
+                    '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}  •  ${getFileSize(videoFileSizeInBytes)}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontFamily: 'Arial',
