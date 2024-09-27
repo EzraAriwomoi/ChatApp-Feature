@@ -62,7 +62,7 @@ class MessageCard extends StatelessWidget {
                   ? Padding(
                       padding: const EdgeInsets.only(right: 3, top: 3, left: 3),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         child: Image(
                           image:
                               CachedNetworkImageProvider(message.textMessage),
@@ -78,18 +78,18 @@ class MessageCard extends StatelessWidget {
                       ),
                       child: Text(
                         "${message.textMessage}         ",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontFamily: 'Arial',
                           letterSpacing: 0,
-                          color: Colors.white,
+                          color: context.theme.colorTextMessage,
                         ),
                       ),
                     ),
             ),
           ),
           Positioned(
-            bottom: message.type == my_type.MessageType.text ? 8 : 4,
+            bottom: message.type == my_type.MessageType.text ? 2 : 4,
             right: message.type == my_type.MessageType.text
                 ? isSender
                     ? 15
@@ -97,12 +97,12 @@ class MessageCard extends StatelessWidget {
                 : 4,
             child: message.type == my_type.MessageType.text
                 ? Text(
-                    DateFormat.Hm().format(message.timeSent),
+                    DateFormat('h:mm a').format(message.timeSent),
                     style: TextStyle(
                       fontSize: 11,
                       fontFamily: 'Arial',
                       letterSpacing: 0,
-                      color: context.theme.greyColor,
+                      color: context.theme.timechat,
                     ),
                   )
                 : Container(
@@ -123,7 +123,7 @@ class MessageCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      DateFormat.Hm().format(message.timeSent),
+                      DateFormat('h:mm a').format(message.timeSent),
                       style: const TextStyle(
                         fontSize: 11,
                         color: Colors.white,

@@ -189,17 +189,16 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (cardHeight > 0) {
-              _toggleCard();
-            }
-          },
-          child: Container(
-            color: Colors.transparent,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
+    return GestureDetector(
+      onTap: () {
+        if (cardHeight > 0) {
+          _toggleCard();
+        }
+      },
+      child: SingleChildScrollView(
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               SizeTransition(
                 sizeFactor: _animation,
                 axis: Axis.vertical,
@@ -386,9 +385,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                 ),
               ),
             ]),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

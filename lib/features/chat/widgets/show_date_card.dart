@@ -12,6 +12,7 @@ class ShowDateCard extends StatelessWidget {
     final now = DateTime.now();
     final currentDate = DateTime(now.year, now.month, now.day);
     final yesterday = currentDate.subtract(const Duration(days: 1));
+    final lastWeek = currentDate.subtract(const Duration(days: 7));
 
     String displayText;
 
@@ -19,6 +20,8 @@ class ShowDateCard extends StatelessWidget {
       displayText = 'Today';
     } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
       displayText = 'Yesterday';
+    } else if (date.isAfter(lastWeek) && date.year == currentDate.year && date.month == currentDate.month) {
+      displayText = DateFormat.EEEE().format(date);
     } else {
       displayText = DateFormat.yMMMMd().format(date);
     }
