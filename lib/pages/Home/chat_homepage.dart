@@ -112,6 +112,10 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
             );
           } else if (snapshot.hasData) {
             final chats = snapshot.data!;
+
+            // Sort the chats by timeSent in descending order
+            chats.sort((a, b) => b.timeSent.compareTo(a.timeSent));
+
             return ScrollConfiguration(
               behavior: NoStretchScrollBehavior(),
               child: ListView(
@@ -126,7 +130,12 @@ class _ChatHomePageState extends ConsumerState<ChatHomePage> {
                           children: [
                             Text(
                               chat.username,
-                              style: const TextStyle(fontSize: 17,fontFamily: 'Arial'),
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Arial',
+                                letterSpacing: 0,
+                                color: context.theme.baricons,
+                              ),
                             ),
                             Text(
                               _formatTime(chat.timeSent),

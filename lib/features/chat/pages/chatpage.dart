@@ -1,14 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:async';
-import 'dart:math';
+// import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:custom_clippers/custom_clippers.dart';
+// import 'package:custom_clippers/custom_clippers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shimmer/shimmer.dart';
+// import 'package:shimmer/shimmer.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
 import 'package:ult_whatsapp/common/models/message_model.dart';
 import 'package:ult_whatsapp/common/models/user_model.dart';
@@ -48,9 +48,24 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     super.dispose();
   }
 
+  // Function to scroll to the bottom
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.of(context).viewInsets;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: context.theme.chatPageBgColor,
       appBar: ChatAppBar(user: widget.user),
       body: ScrollConfiguration(
@@ -66,109 +81,91 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           ),
           // Stream of Chat
           Padding(
-            padding: const EdgeInsets.only(bottom: 60),
+            padding: EdgeInsets.only(
+              bottom: viewInsets.bottom + 60, // Adjust for the keyboard height
+            ),
             child: StreamBuilder<List<MessageModel>>(
               stream: ref
                   .watch(chatControllerProvider)
                   .getAllOneToOneMessage(widget.user.uid),
               builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.active) {
-                  return ListView.builder(
-                    itemCount: 15,
-                    itemBuilder: (_, index) {
-                      final random = Random().nextInt(14);
-                      return Container(
-                        alignment: random.isEven
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        margin: EdgeInsets.only(
-                          top: 5,
-                          bottom: 5,
-                          left: random.isEven ? 150 : 15,
-                          right: random.isEven ? 15 : 150,
-                        ),
-                        child: ClipPath(
-                          clipper: UpperNipMessageClipperTwo(
-                            random.isEven
-                                ? MessageType.send
-                                : MessageType.receive,
-                            nipWidth: 8,
-                            nipHeight: 10,
-                            bubbleRadius: 12,
-                          ),
-                          child: Shimmer.fromColors(
-                            baseColor: random.isEven
-                                ? context.theme.greyColor!.withOpacity(.3)
-                                : context.theme.greyColor!.withOpacity(.2),
-                            highlightColor: random.isEven
-                                ? context.theme.greyColor!.withOpacity(.4)
-                                : context.theme.greyColor!.withOpacity(.3),
-                            child: Container(
-                              height: 40,
-                              width: 170 +
-                                  double.parse(
-                                    (random * 2).toString(),
-                                  ),
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }
+                // if (snapshot.connectionState != ConnectionState.active) {
+                //   return _buildLoadingChat();
+                // }
+
+                DateTime? lastDateDisplayed;
+
+                // Auto scroll to the bottom
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    _scrollToBottom();
+                  }
+                });
 
                 return PageStorage(
                   bucket: pageStorageBucket,
-                  child: ListView.builder(
-                    key: const PageStorageKey('chat_page_list'),
-                    itemCount: snapshot.data!.length,
-                    shrinkWrap: true,
-                    controller: _scrollController,
-                    itemBuilder: (_, index) {
-                      final message = snapshot.data![index];
-                      final isSender = message.senderId ==
-                          FirebaseAuth.instance.currentUser!.uid;
+                  child: snapshot.data == null || snapshot.data!.isEmpty
+                      ? const Column(
+                          children: [
+                            YellowCard(),
+                          ],
+                        )
+                      : ListView.builder(
+                          key: const PageStorageKey('chat_page_list'),
+                          itemCount: snapshot.data!.length,
+                          shrinkWrap: true,
+                          controller: _scrollController,
+                          itemBuilder: (_, index) {
+                            final message = snapshot.data![index];
+                            final isSender = message.senderId ==
+                                FirebaseAuth.instance.currentUser!.uid;
 
-                      final haveNip = (index == 0) ||
-                          (index == snapshot.data!.length - 1 &&
-                              message.senderId !=
-                                  snapshot.data![index - 1].senderId) ||
-                          (message.senderId !=
-                                  snapshot.data![index - 1].senderId &&
-                              message.senderId ==
-                                  snapshot.data![index + 1].senderId) ||
-                          (message.senderId !=
-                                  snapshot.data![index - 1].senderId &&
-                              message.senderId !=
-                                  snapshot.data![index + 1].senderId);
-                      final isShowDateCard = (index == 0) ||
-                          ((index == snapshot.data!.length - 1) &&
-                              (message.timeSent.day >
-                                  snapshot.data![index - 1].timeSent.day)) ||
-                          (message.timeSent.day >
-                                  snapshot.data![index - 1].timeSent.day &&
-                              message.timeSent.day <=
-                                  snapshot.data![index + 1].timeSent.day);
+                            final messageDate = message.timeSent.toLocal();
+                            final currentDate = DateTime.now();
 
-                      return Column(children: [
-                        if (index == 0) const YellowCard(),
-                        if (isShowDateCard)
-                          ShowDateCard(date: message.timeSent.toLocal()),
-                        MessageCard(
-                          isSender: isSender,
-                          haveNip: haveNip,
-                          message: message,
+                            bool isToday =
+                                messageDate.year == currentDate.year &&
+                                    messageDate.month == currentDate.month &&
+                                    messageDate.day == currentDate.day;
+
+                            bool shouldShowDateCard = false;
+
+                            if (isToday &&
+                                (lastDateDisplayed == null ||
+                                    lastDateDisplayed?.day !=
+                                        currentDate.day)) {
+                              shouldShowDateCard = true;
+                              lastDateDisplayed = currentDate;
+                            } else if (messageDate.day !=
+                                (index > 0
+                                    ? snapshot.data![index - 1].timeSent.day
+                                    : -1)) {
+                              shouldShowDateCard = true;
+                              lastDateDisplayed = messageDate;
+                            }
+
+                            return Column(
+                              children: [
+                                if (index == 0) const YellowCard(),
+                                if (shouldShowDateCard)
+                                  ShowDateCard(date: messageDate),
+                                MessageCard(
+                                  isSender: isSender,
+                                  haveNip: false,
+                                  message: message,
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                      ]);
-                    },
-                  ),
                 );
               },
             ),
           ),
-          Container(
-            alignment: const Alignment(0, 1),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: viewInsets.bottom > 0 ? viewInsets.bottom : 0,
             child: ChatTextField(
               receiverId: widget.user.uid,
               scrollController: _scrollController,
@@ -179,6 +176,46 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       ),
     );
   }
+
+  // Widget _buildLoadingChat() {
+  //   return ListView.builder(
+  //     itemCount: 15,
+  //     itemBuilder: (_, index) {
+  //       final random = Random().nextInt(14);
+  //       return Container(
+  //         alignment:
+  //             random.isEven ? Alignment.centerRight : Alignment.centerLeft,
+  //         margin: EdgeInsets.only(
+  //           top: 5,
+  //           bottom: 5,
+  //           left: random.isEven ? 150 : 15,
+  //           right: random.isEven ? 15 : 150,
+  //         ),
+  //         child: ClipPath(
+  //           clipper: UpperNipMessageClipperTwo(
+  //             random.isEven ? MessageType.send : MessageType.receive,
+  //             nipWidth: 8,
+  //             nipHeight: 10,
+  //             bubbleRadius: 12,
+  //           ),
+  //           child: Shimmer.fromColors(
+  //             baseColor: random.isEven
+  //                 ? context.theme.greyColor!.withOpacity(.3)
+  //                 : context.theme.greyColor!.withOpacity(.2),
+  //             highlightColor: random.isEven
+  //                 ? context.theme.greyColor!.withOpacity(.4)
+  //                 : context.theme.greyColor!.withOpacity(.3),
+  //             child: Container(
+  //               height: 40,
+  //               width: 170 + double.parse((random * 2).toString()),
+  //               color: Colors.red,
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
 
 class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {

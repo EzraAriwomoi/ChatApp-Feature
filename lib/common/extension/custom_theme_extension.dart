@@ -33,6 +33,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? seachbarColor;
   final Color? thicktopline;
   final Color? thickbottomline;
+  final Color? colorTextMessage;
+  final Color? timechat;
 
   const CustomThemeExtension({
     this.circleImageColor,
@@ -59,6 +61,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.seachbarColor,
     this.thicktopline,
     this.thickbottomline,
+    this.colorTextMessage,
+    this.timechat,
   });
 
   static const lightMode = CustomThemeExtension(
@@ -86,6 +90,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     seachbarColor: Color.fromARGB(255, 241, 240, 240),
     thicktopline: Color.fromARGB(255, 212, 212, 212),
     thickbottomline: Color.fromARGB(255, 243, 243, 243),
+    colorTextMessage: Colors.black,
+    timechat: Color.fromARGB(255, 107, 107, 107),
   );
 
   static const darkMode = CustomThemeExtension(
@@ -101,7 +107,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     chatTextFieldBg: Coloors.greyBackground,
     chatPageBgColor: Color(0xFF081419),
     chatPageDoodleColor: Color(0xFF172428),
-    senderChatCardBg: Color(0xFF005C4B),
+    senderChatCardBg: Color.fromARGB(255, 24, 88, 62),
     receiverChatCardBg: Coloors.greyBackground,
     yellowCardBgColor: Color(0xFF222E35),
     yellowCardTextColor: Color(0xFFFFD279),
@@ -112,6 +118,8 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     seachbarColor: Color.fromARGB(255, 21, 31, 37),
     thicktopline: Colors.black,
     thickbottomline: Colors.black,
+    colorTextMessage: Colors.white,
+    timechat: Color.fromARGB(255, 201, 201, 201),
   );
 
   @override
