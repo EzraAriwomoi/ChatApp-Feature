@@ -65,4 +65,16 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    // Flutter dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // Add your other dependencies here
+    // For example, if you're using Firebase or other services:
+    // implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    // implementation 'com.google.firebase:firebase-analytics'
+
+    // AndroidX dependencies (make sure to resolve any conflicts)
+    implementation 'androidx.core:core-ktx:1.6.0'
+}

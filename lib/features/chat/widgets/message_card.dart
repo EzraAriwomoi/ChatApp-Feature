@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ult_whatsapp/common/extension/custom_theme_extension.dart';
@@ -36,22 +35,25 @@ class MessageCard extends StatelessWidget {
                 : 15
             : 80,
       ),
-      child: ClipPath(
-        clipper: haveNip
-            ? UpperNipMessageClipperTwo(
-                isSender ? MessageType.send : MessageType.receive,
-                nipWidth: 8,
-                nipHeight: 10,
-                bubbleRadius: haveNip ? 12 : 0,
-              )
-            : null,
+      child: CustomPaint(
+        painter: BubblePainter(
+          isSender: isSender,
+          bubbleColor: isSender
+              ? context.theme.senderChatCardBg!
+              : context.theme.receiverChatCardBg!,
+        ),
         child: Stack(children: [
           Container(
             decoration: BoxDecoration(
               color: isSender
                   ? context.theme.senderChatCardBg
                   : context.theme.receiverChatCardBg,
-              borderRadius: haveNip ? null : BorderRadius.circular(12),
+              borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(14),
+                      topRight: Radius.circular(0),
+                      bottomLeft: Radius.circular(14),
+                      bottomRight: Radius.circular(14),
+                    ),
               boxShadow: const [
                 BoxShadow(color: Colors.black38),
               ],
@@ -135,4 +137,39 @@ class MessageCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class BubblePainter extends CustomPainter {
+  final bool isSender;
+  final Color bubbleColor;
+
+  BubblePainter({required this.isSender, required this.bubbleColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = bubbleColor
+      ..style = PaintingStyle.fill;
+
+    var path = Path();
+
+    if (isSender) {
+      // Right-side bubble
+      path.moveTo(size.width + 8, 0);
+      path.lineTo(size.width, 10);
+      path.lineTo(size.width - 10, 0);
+    } else {
+      // Receiver's bubble
+      path.lineTo(0, size.height - 10);
+      path.lineTo(-10, size.height - 20);
+      path.lineTo(0, size.height - 30);
+      path.quadraticBezierTo(0, size.height - 20, 10, size.height - 20);
+    }
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
