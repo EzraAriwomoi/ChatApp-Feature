@@ -35,6 +35,9 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? thickbottomline;
   final Color? colorTextMessage;
   final Color? timechat;
+  final emojibackground;
+  final emojiiconcolor;
+  final iconColorSelected;
 
   const CustomThemeExtension({
     this.circleImageColor,
@@ -63,6 +66,9 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     this.thickbottomline,
     this.colorTextMessage,
     this.timechat,
+    this.emojibackground,
+    this.emojiiconcolor,
+    this.iconColorSelected,
   });
 
   static const lightMode = CustomThemeExtension(
@@ -92,6 +98,9 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     thickbottomline: Color.fromARGB(255, 243, 243, 243),
     colorTextMessage: Colors.black,
     timechat: Color.fromARGB(255, 107, 107, 107),
+    emojibackground: Colors.white,
+    emojiiconcolor: Coloors.greyLight,
+    iconColorSelected: Colors.black,
   );
 
   static const darkMode = CustomThemeExtension(
@@ -120,6 +129,9 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     thickbottomline: Colors.black,
     colorTextMessage: Colors.white,
     timechat: Color.fromARGB(255, 201, 201, 201),
+    emojibackground: Coloors.greyBackground,
+    emojiiconcolor: Coloors.greyDark,
+    iconColorSelected: Colors.white,
   );
 
   @override
