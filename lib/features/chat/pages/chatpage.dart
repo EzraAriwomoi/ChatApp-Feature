@@ -61,6 +61,90 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     });
   }
 
+  Widget buildChatStream({
+  required ScrollController scrollController,
+  required EdgeInsets viewInsets,
+  required UserModel user,
+  required EdgeInsets padding,
+}) {
+  return Padding(
+    padding: padding,
+    child: StreamBuilder<List<MessageModel>>(
+      stream: ref.watch(chatControllerProvider).getAllOneToOneMessage(user.uid),
+      builder: (context, snapshot) {
+        DateTime? lastDateDisplayed;
+
+        // Auto scroll to the bottom
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            if (scrollController.hasClients) {
+              scrollController.animateTo(
+                scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          }
+        });
+
+        return PageStorage(
+          bucket: pageStorageBucket,
+          child: snapshot.data == null || snapshot.data!.isEmpty
+              ? const Column(
+                  children: [
+                    YellowCard(),
+                  ],
+                )
+              : ListView.builder(
+                  key: const PageStorageKey('chat_page_list'),
+                  itemCount: snapshot.data!.length,
+                  shrinkWrap: true,
+                  controller: scrollController,
+                  itemBuilder: (_, index) {
+                    final message = snapshot.data![index];
+                    final isSender =
+                        message.senderId == FirebaseAuth.instance.currentUser!.uid;
+                    final messageDate = message.timeSent.toLocal();
+                    final currentDate = DateTime.now();
+
+                    bool isToday = messageDate.year == currentDate.year &&
+                        messageDate.month == currentDate.month &&
+                        messageDate.day == currentDate.day;
+
+                    bool shouldShowDateCard = false;
+
+                    if (isToday &&
+                        (lastDateDisplayed == null ||
+                            lastDateDisplayed?.day != currentDate.day)) {
+                      shouldShowDateCard = true;
+                      lastDateDisplayed = currentDate;
+                    } else if (messageDate.day !=
+                        (index > 0
+                            ? snapshot.data![index - 1].timeSent.day
+                            : -1)) {
+                      shouldShowDateCard = true;
+                      lastDateDisplayed = messageDate;
+                    }
+
+                    return Column(
+                      children: [
+                        if (index == 0) const YellowCard(),
+                        if (shouldShowDateCard) ShowDateCard(date: messageDate),
+                        MessageCard(
+                          isSender: isSender,
+                          haveNip: false,
+                          message: message,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        );
+      },
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     final viewInsets = MediaQuery.of(context).viewInsets;
@@ -80,88 +164,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             color: context.theme.chatPageDoodleColor,
           ),
           // Stream of Chat
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: viewInsets.bottom + 60, // Adjust for the keyboard height
+          buildChatStream(
+              scrollController: _scrollController,
+              viewInsets: viewInsets,
+              user: widget.user,
+              padding: EdgeInsets.only(bottom: viewInsets.bottom + 60),
             ),
-            child: StreamBuilder<List<MessageModel>>(
-              stream: ref
-                  .watch(chatControllerProvider)
-                  .getAllOneToOneMessage(widget.user.uid),
-              builder: (context, snapshot) {
-                // if (snapshot.connectionState != ConnectionState.active) {
-                //   return _buildLoadingChat();
-                // }
-
-                DateTime? lastDateDisplayed;
-
-                // Auto scroll to the bottom
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    _scrollToBottom();
-                  }
-                });
-
-                return PageStorage(
-                  bucket: pageStorageBucket,
-                  child: snapshot.data == null || snapshot.data!.isEmpty
-                      ? const Column(
-                          children: [
-                            YellowCard(),
-                          ],
-                        )
-                      : ListView.builder(
-                          key: const PageStorageKey('chat_page_list'),
-                          itemCount: snapshot.data!.length,
-                          shrinkWrap: true,
-                          controller: _scrollController,
-                          itemBuilder: (_, index) {
-                            final message = snapshot.data![index];
-                            final isSender = message.senderId ==
-                                FirebaseAuth.instance.currentUser!.uid;
-
-                            final messageDate = message.timeSent.toLocal();
-                            final currentDate = DateTime.now();
-
-                            bool isToday =
-                                messageDate.year == currentDate.year &&
-                                    messageDate.month == currentDate.month &&
-                                    messageDate.day == currentDate.day;
-
-                            bool shouldShowDateCard = false;
-
-                            if (isToday &&
-                                (lastDateDisplayed == null ||
-                                    lastDateDisplayed?.day !=
-                                        currentDate.day)) {
-                              shouldShowDateCard = true;
-                              lastDateDisplayed = currentDate;
-                            } else if (messageDate.day !=
-                                (index > 0
-                                    ? snapshot.data![index - 1].timeSent.day
-                                    : -1)) {
-                              shouldShowDateCard = true;
-                              lastDateDisplayed = messageDate;
-                            }
-
-                            return Column(
-                              children: [
-                                if (index == 0) const YellowCard(),
-                                if (shouldShowDateCard)
-                                  ShowDateCard(date: messageDate),
-                                MessageCard(
-                                  isSender: isSender,
-                                  haveNip: false,
-                                  message: message,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                );
-              },
-            ),
-          ),
           Positioned(
             left: 0,
             right: 0,
