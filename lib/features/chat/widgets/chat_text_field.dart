@@ -127,10 +127,13 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
   }
 
   void sendTextMessage() async {
-    if (isMessageIconEnabled) {
+    final messageText =
+        messageController.text.trimLeft();
+
+    if (messageText.isNotEmpty) {
       ref.read(chatControllerProvider).sendTextMessage(
             context: context,
-            textMessage: messageController.text,
+            textMessage: messageText,
             receiverId: widget.receiverId,
           );
       messageController.clear();
@@ -318,7 +321,7 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                       minLines: 1,
                       onChanged: (value) {
                         setState(() {
-                          isMessageIconEnabled = value.isNotEmpty;
+                          isMessageIconEnabled = value.trim().isNotEmpty;
                           _updateIconAnimations(value.isNotEmpty);
                         });
                       },
@@ -403,7 +406,11 @@ class _ChatTextFieldState extends ConsumerState<ChatTextField>
                   ),
                   const SizedBox(width: 5),
                   CustomIconButton(
-                    onPressed: sendTextMessage,
+                    onPressed: () {
+                      if (messageController.text.trim().isNotEmpty) {
+                        sendTextMessage();
+                      }
+                    },
                     icon: isMessageIconEnabled
                         ? Icons.send_rounded
                         : Icons.mic_rounded,

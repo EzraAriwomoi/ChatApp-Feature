@@ -64,6 +64,7 @@ dependencies:
   video_thumbnail: ^0.5.3
   emoji_picker_flutter: ^3.1.0
   shared_preferences: ^2.3.2
+  language_picker: ^0.4.5
 
 flutter_native_splash:
   color: "#FFFFFF"

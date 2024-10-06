@@ -20,13 +20,14 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(children: [
+        const SizedBox(height: 25),
         Expanded(
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 50,
-                vertical: 10,
+                horizontal: 56,
+                vertical: 0,
               ),
               child: Image.asset(
                 'assets/circle.png',
@@ -41,17 +42,24 @@ class WelcomePage extends StatelessWidget {
             const Text(
               'Welcome to UltWhatsApp',
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontSize: 26,
+                fontFamily: 'Arial',
+                letterSpacing: 0,
               ),
             ),
             const PrivacyAndTerms(),
-            CustomElevatedButton(
-              onPressed: () => navigateToLoginPage(context),
-              text: 'AGREE AND CONTINUE',
-            ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 10),
             const LanguageButton(),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 8,
+              ),
+              child: CustomElevatedButton(
+                onPressed: () => navigateToLoginPage(context),
+                text: 'Agree and continue',
+              ),
+            ),
           ]),
         ),
       ]),

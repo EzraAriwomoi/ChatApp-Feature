@@ -43,8 +43,11 @@ class MyApp extends ConsumerWidget {
       themeMode: ThemeMode.system,
       home: ref.watch(userInfoAuthProvider).when(
             data: (user) {
-              // Directly returning the appropriate page based on user authentication state
-              if (user == null) return const WelcomePage();
+              if (user == null) {
+                // No user is logged in, redirect to WelcomePage
+                return const WelcomePage();
+              }
+              // User is authenticated, go to HomePage
               return const HomePage();
             },
             error: (error, trace) {

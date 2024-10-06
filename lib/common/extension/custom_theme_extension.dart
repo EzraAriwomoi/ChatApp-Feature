@@ -107,7 +107,7 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     circleImageColor: Coloors.greenDark,
     greyColor: Coloors.greyDark,
     blueColor: Coloors.blueDark,
-    langBgColor: Color(0xFF182229),
+    langBgColor: Color.fromARGB(255, 18, 25, 31),
     langHightlightColor: Color(0xFF09141A),
     authAppbarTextColor: Color(0xFFE9EDEF),
     photoIconBgColor: Color(0xFF283339),
