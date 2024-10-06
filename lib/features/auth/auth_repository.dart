@@ -66,11 +66,19 @@ class AuthRepository {
   }
 
   Future<void> updateActiveStatus(bool isOnline) async {
-    final userStatusDatabaseRef = realtime.ref('status/${auth.currentUser!.uid}');
+    final user = auth.currentUser;
+    if (user == null) return;
+
+    final userStatusDatabaseRef = realtime.ref('status/${user.uid}');
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    // Update Firestore and Realtime Database with the user's online status
-    await firestore.collection('users').doc(auth.currentUser!.uid).update({
+    // This ensures that when the user disconnects, their status is automatically set to offline
+    await userStatusDatabaseRef.onDisconnect().set({
+      'is_online': false,
+      'lastSeen': DateTime.now().millisecondsSinceEpoch,
+    });
+
+    await firestore.collection('users').doc(user.uid).update({
       'is_online': isOnline,
       'lastSeen': timestamp,
     });
@@ -101,8 +109,10 @@ class AuthRepository {
         context: context,
         message: "Saving user info ... ",
       );
+
       String uid = auth.currentUser!.uid;
       String profileImageUrl = profileImage is String ? profileImage : '';
+
       if (profileImage != null && profileImage is! String) {
         profileImageUrl = await ref
             .read(firebaseStorageRepositoryProvider)
@@ -120,7 +130,8 @@ class AuthRepository {
       );
 
       await firestore.collection('users').doc(uid).set(user.toMap());
-      if (!mounted) return;
+
+      if (!mounted) return; // Avoid using context if the widget is unmounted
 
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -128,8 +139,10 @@ class AuthRepository {
         (route) => false,
       );
     } catch (e) {
-      Navigator.pop(context);
-      showAlertDialog(context: context, message: e.toString());
+      if (mounted) {
+        Navigator.pop(context);
+        showAlertDialog(context: context, message: e.toString());
+      }
     }
   }
 

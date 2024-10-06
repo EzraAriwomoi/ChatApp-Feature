@@ -48,9 +48,16 @@ class MessageCard extends StatelessWidget {
               color: isSender
                   ? context.theme.senderChatCardBg
                   : context.theme.receiverChatCardBg,
-              borderRadius: const BorderRadius.only(
+              borderRadius: isSender
+                  ? const BorderRadius.only(
                       topLeft: Radius.circular(14),
-                      topRight: Radius.circular(0),
+                      topRight: Radius.zero,
+                      bottomLeft: Radius.circular(14),
+                      bottomRight: Radius.circular(14),
+                    )
+                  : const BorderRadius.only(
+                      topLeft: Radius.zero,
+                      topRight: Radius.circular(14),
                       bottomLeft: Radius.circular(14),
                       bottomRight: Radius.circular(14),
                     ),
@@ -154,16 +161,15 @@ class BubblePainter extends CustomPainter {
     var path = Path();
 
     if (isSender) {
-      // Right-side bubble
+      // Right-side bubble (sender)
       path.moveTo(size.width + 8, 0);
       path.lineTo(size.width, 10);
       path.lineTo(size.width - 10, 0);
     } else {
-      // Receiver's bubble
-      path.lineTo(0, size.height - 10);
-      path.lineTo(-10, size.height - 20);
-      path.lineTo(0, size.height - 30);
-      path.quadraticBezierTo(0, size.height - 20, 10, size.height - 20);
+      // Left-side bubble (receiver)
+      path.moveTo(-8, 0);
+      path.lineTo(0, 10);
+      path.lineTo(10, 0);
     }
 
     path.close();

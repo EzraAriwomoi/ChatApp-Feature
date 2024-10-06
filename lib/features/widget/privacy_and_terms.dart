@@ -7,27 +7,31 @@ class PrivacyAndTerms extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 10),
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
             text: 'Read our ',
             style: TextStyle(
               color: context.theme.greyColor,
-              height: 1.5,
+              fontSize: 12,
+              letterSpacing: 0,
+              height: 1.5
             ),
             children: [
               TextSpan(
                 text: 'Privacy Policy. ',
                 style: TextStyle(
                   color: context.theme.blueColor,
+                  letterSpacing: 0,
                 ),
               ),
               const TextSpan(text: 'Tap "Agree and continue" to accept the '),
               TextSpan(
-                text: 'Terms of Services.',
+                text: 'Terms of Service.',
                 style: TextStyle(
                   color: context.theme.blueColor,
+                  letterSpacing: 0,
                 ),
               ),
             ]),
